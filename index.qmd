@@ -1,0 +1,8 @@
+---
+title: "Welcome"
+format: html
+---
+
+# Welcome to the Practicals
+
+This site hosts practical exercises and materials for the course **Advanced Pooled Analyses for Clinical Trial Statisticians**.

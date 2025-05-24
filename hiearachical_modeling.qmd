@@ -1,0 +1,82 @@
+---
+title: "Hierarchical Modeling"
+format: html
+---
+
+## Simulating Homogeneous Trials
+
+In this section, we simulate data from a set of homogeneous clinical trials.
+
+We generate 5 trials that are similar in design and patient population:
+
+- Each trial uses 1:1 randomization between treatment and control arms
+- All trials draw patients from the same underlying population, with the same baseline severity distribution
+- The treatment effect is identical across all trials
+
+```{r}
+#| message: false
+#| 
+library(dplyr)
+library(ggplot2)
+source("R/simulate_trials.R")
+
+# Simulate 5 trials with 100 patients each (50 per arm)
+df <- simulate_trials(
+  n_trials = 5,
+  n_per_arm = 50,
+  beta_W = 0,     # no within-trial effect modification
+  beta_A = 0      # no across-trial effect modification
+)
+```
+
+
+## Naive pooling
+
+@fig-naive-pooling visualizes the relationship between baseline severity and change from baseline within each treatment arm using a naively pooled analysis.
+
+
+```{r}
+#| message: false
+#| echo: false
+#| fig-cap: "Naive Pooled Analysis of Change from Baseline by Treatment Group"
+#| label: fig-naive-pooling
+#| fig-width: 10
+#| fig-height: 8
+library(ggplot2)
+library(dplyr)
+
+# Precompute mean labels
+mean_labels <- df %>%
+  group_by(trta) %>%
+  summarise(mean_change = mean(change, na.rm = TRUE)) %>%
+  mutate(label = paste0("Mean change: ", round(mean_change, 1)))
+
+ggplot(df, aes(x = baseline, y = change)) +
+  geom_point(aes(color=trial),alpha = 0.6) +
+  geom_smooth(method = "lm", aes(group = 1), color = "black") +
+  geom_text(
+    data = mean_labels,
+    aes(x = -Inf, y = Inf, label = label),
+    hjust = -0.1, vjust = 1.2,
+    inherit.aes = FALSE
+  ) +
+  labs(
+    title = "Change from Baseline by Treatment Group",
+    subtitle = "No within- or across-trial effect modification",
+    x = "Baseline Severity",
+    y = "Change from Baseline"
+  ) +
+  facet_wrap(~ trta, ncol = 1) +
+  theme_minimal() +
+  facet_wrap(~ trta, ncol = 1) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+```
+
+The plot shows that:
+
+- The mean change in the active group is `r mean_labels %>% filter(trta == "Active") %>% pull(mean_change) %>% round(digits = 1)`
+- The mean change in the control group is `r mean_labels %>% filter(trta == "Control") %>% pull(mean_change) %>% round(digits = 1)`
+
+**Question for Discussion**: Can we interpret the pooled treatment effect as simply the difference in means?
