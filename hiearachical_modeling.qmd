@@ -30,7 +30,7 @@ df <- simulate_trials(
 ```
 
 
-## Naive pooling
+## Estimating the Pooled Treatment Effect
 
 @fig-naive-pooling visualizes the relationship between baseline severity and change from baseline within each treatment arm using a naively pooled analysis.
 
@@ -81,9 +81,42 @@ The plot shows that:
 
 **Question for Discussion**: Can we interpret the pooled treatment effect as simply the difference in means?
 
-We can estimate the pooled treatment effect by modelling the observed outcome as a function of treatment allocation and baseline severity:
+### Naive Analysis
+
+We begin by estimating the pooled treatment effect using a simple regression model that adjusts for baseline severity but ignores trial structure. This reflects a naive analysis:
 
 ```{r}
 #| message: false
-((fit <- glm(outcome ~ trta + baseline, data = df)))
+((fit_naive <- glm(outcome ~ trta + baseline, data = df)))
 ```
+
+```{r}
+#| echo: false
+est_naive <- coef(fit_naive)["trtaActive"]
+ci_naive  <- confint.default(fit_naive)["trtaActive", ]
+```
+
+In this naive model, the estimated treatment effect is: 
+
+`r sprintf("Treatment effect: %.2f (95%% CI: %.2f to %.2f)", est_naive, ci_naive[1], ci_naive[2])`
+
+
+### Stratified Analysis by Trial
+
+Next, we fit a stratified model that accounts for trial-specific intercepts by including trial as a fixed effect (without a global intercept):
+
+```{r}
+#| message: false
+((fit_stratified <- glm(outcome ~ -1 + trial + trta + baseline, data = df)))
+```
+
+```{r}
+#| echo: false
+est_stratified <- coef(fit_stratified)["trtaActive"]
+ci_stratified  <- confint.default(fit_stratified)["trtaActive", ]
+```
+
+This model yields the following treatment effect estimate: 
+
+`r sprintf("Treatment effect: %.2f (95%% CI: %.2f to %.2f)", est_stratified, ci_stratified[1], ci_stratified[2])`
+
