@@ -80,3 +80,10 @@ The plot shows that:
 - The mean change in the control group is `r mean_labels %>% filter(trta == "Control") %>% pull(mean_change) %>% round(digits = 1)`
 
 **Question for Discussion**: Can we interpret the pooled treatment effect as simply the difference in means?
+
+We can estimate the pooled treatment effect by modelling the observed outcome as a function of treatment allocation and baseline severity:
+
+```{r}
+#| message: false
+((fit <- glm(outcome ~ trta + baseline, data = df)))
+```

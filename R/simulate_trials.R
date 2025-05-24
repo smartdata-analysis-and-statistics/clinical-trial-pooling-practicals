@@ -51,5 +51,8 @@ simulate_trials <- function(
     )
   })
 
-  do.call(rbind, data_list)
+  out <- do.call(rbind, data_list)
+  out <- out %>% mutate(trta = factor(ifelse(trt == 1, "Active", "Control"), levels = c("Control", "Active")))
+
+  return(out)
 }
