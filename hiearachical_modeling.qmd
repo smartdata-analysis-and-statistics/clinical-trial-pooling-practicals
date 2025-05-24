@@ -103,20 +103,35 @@ In this naive model, the estimated treatment effect is:
 
 ### Stratified Analysis by Trial
 
-Next, we fit a stratified model that accounts for trial-specific intercepts by including trial as a fixed effect (without a global intercept):
+Next, we fit a stratified model that accounts for trial-specific intercepts by including trial as a fixed effect (without a global intercept).  This approach allows each trial to have its own baseline level of the outcome, effectively adjusting for differences in average outcomes across trials.
 
 ```{r}
 #| message: false
 ((fit_stratified <- glm(outcome ~ -1 + trial + trta + baseline, data = df)))
 ```
 
+
+
 ```{r}
 #| echo: false
 est_stratified <- coef(fit_stratified)["trtaActive"]
 ci_stratified  <- confint.default(fit_stratified)["trtaActive", ]
+
+# Extract all coefficients related to trial intercepts
+intercepts <- coef(fit_stratified)[grep("^trial", names(coef(fit_stratified)))]
+
+# Get the minimum and maximum values
+min_intercept <- min(intercepts)
+max_intercept <- max(intercepts)
 ```
 
-This model yields the following treatment effect estimate: 
+This model yields the following treatment effect estimate  (`trtaActive`), which is adjusted for trial-level differences and baseline covariates.
 
 `r sprintf("Treatment effect: %.2f (95%% CI: %.2f to %.2f)", est_stratified, ci_stratified[1], ci_stratified[2])`
+
+Note that all trial-specific intercepts are fairly similar (ranging from approximately `r round(min(intercepts),2)` to `r round(max(intercepts),2)`), which suggests there is no strong 'trial effect' in the data. This is consistent with how the data were simulated — the underlying outcome-generating mechanism assumed comparable average outcomes across trials, apart from random noise.
+
+The homogeneity in trial-specific intercepts suggests that a naively pooled model with a global intercept could be reasonable in this scenario. However, this remains a strong assumption — even small differences across trials can introduce bias if not properly accounted for. Stratifying by trial offers a more robust approach by explicitly modeling these differences, even when they appear minor.
+
+### Random trial effects
 
