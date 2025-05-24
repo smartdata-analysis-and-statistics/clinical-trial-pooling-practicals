@@ -11,6 +11,9 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
@@ -22,7 +25,7 @@ jobs:
 
       - name: Install R packages
         run: |
-          Rscript -e 'install.packages("tidyverse", repos = "https://cloud.r-project.org")'
+          Rscript -e 'install.packages(c("quarto", "tidyverse", "ggplot2", "dplyr"), repos = "https://cloud.r-project.org")'
 
       - name: Render site
         run: quarto render
@@ -33,4 +36,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./_site
           publish_branch: gh-pages
-          force_orphan: true  # creates branch if it doesn’t exist
+          force_orphan: true
