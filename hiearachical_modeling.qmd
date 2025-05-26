@@ -3,15 +3,18 @@ title: "Hierarchical Modeling"
 format: html
 ---
 
-## Simulating Homogeneous Trials
+# Pooling Homogeneous Trials
 
-In this section, we simulate data from a set of homogeneous clinical trials.
+In this example, we consider a scenario in which **all trials are homogeneous** — that is, they share similar designs, patient populations, and a consistent treatment effect.
 
-We generate 5 trials that are similar in design and patient population:
+## Simulating data
 
-- Each trial uses 1:1 randomization between treatment and control arms
-- All trials draw patients from the same underlying population, with the same baseline severity distribution
-- The treatment effect is identical across all trials
+We simulate 5 trials, each with the following characteristics:
+
+- 1:1 randomization between treatment and control arms  
+- Patients drawn from the same underlying population  
+- Identical baseline severity distribution across trials  
+- A constant treatment effect with no variation across trials
 
 ```{r}
 #| message: false
@@ -24,11 +27,19 @@ source("R/simulate_trials.R")
 df <- simulate_trials(
   n_trials = 5,
   n_per_arm = 50,
+  baseline_mean_fn = function(trial_id) 25, # Common mean baseline
   beta_W = 0,     # no within-trial effect modification
   beta_A = 0      # no across-trial effect modification
 )
 ```
 
+```{r}
+#| message: false
+#| echo: false
+source("R/tables.R")
+
+summarize_baseline_by_trial(df)
+```
 
 ## Estimating the Pooled Treatment Effect
 
@@ -42,36 +53,12 @@ df <- simulate_trials(
 #| label: fig-naive-pooling
 #| fig-width: 10
 #| fig-height: 8
-library(ggplot2)
-library(dplyr)
-
-# Precompute mean labels
+source(file.path("R", "visualization.R"))
 mean_labels <- df %>%
-  group_by(trta) %>%
-  summarise(mean_change = mean(change, na.rm = TRUE)) %>%
-  mutate(label = paste0("Mean change: ", round(mean_change, 1)))
-
-ggplot(df, aes(x = baseline, y = change)) +
-  geom_point(aes(color=trial),alpha = 0.6) +
-  geom_smooth(method = "lm", aes(group = 1), color = "black") +
-  geom_text(
-    data = mean_labels,
-    aes(x = -Inf, y = Inf, label = label),
-    hjust = -0.1, vjust = 1.2,
-    inherit.aes = FALSE
-  ) +
-  labs(
-    title = "Change from Baseline by Treatment Group",
-    subtitle = "No within- or across-trial effect modification",
-    x = "Baseline Severity",
-    y = "Change from Baseline"
-  ) +
-  facet_wrap(~ trta, ncol = 1) +
-  theme_minimal() +
-  facet_wrap(~ trta, ncol = 1) +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-
+    group_by(trta) %>%
+    summarise(mean_change = mean(change, na.rm = TRUE)) %>%
+    mutate(label = paste0("Mean change: ", round(mean_change, 1)))
+plot_change_by_treatment_with_means(df)
 ```
 
 The plot shows that:
@@ -100,6 +87,59 @@ In this naive model, the estimated treatment effect is:
 
 `r sprintf("Treatment effect: %.2f (95%% CI: %.2f to %.2f)", est_naive, ci_naive[1], ci_naive[2])`
 
+The figure below visualizes `fit_naive` by showing predicted outcomes across baseline severity values for each treatment group, alongside the observed data.
+
+```{r}
+#| message: false
+#| echo: false
+#| fig-cap: "Model-Predicted and Observed Outcomes from Naive Pooled Analysis by Treatment Group"
+#| label: fig-model-fit-naive
+#| fig-width: 8
+#| fig-height: 6
+
+# Prepare new data for prediction
+new_data <- expand.grid(
+  baseline = seq(min(df$baseline), max(df$baseline), length.out = 100),
+  trta = levels(df$trta)
+)
+
+# Get model predictions
+new_data$pred <- predict(fit_naive, newdata = new_data)
+
+# Plot: Observed outcomes and model-predicted lines by treatment
+ggplot() +
+  # Model prediction lines (same slope, treatment-specific intercepts)
+  geom_line(data = new_data, aes(x = baseline, y = pred), color = "black", linewidth  = 1.2) +
+
+  # Observed data points
+  geom_point(data = df, aes(x = baseline, y = outcome), alpha = 0.4, color = "#B90066", size = 1.5) +
+
+  # Horizontal line at 0
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray60") +
+
+  # Facet by treatment
+  facet_wrap(~trta) +
+
+  # Labels
+  labs(
+  title = "Observed Outcomes and Model-Predicted Values by Treatment Group",
+  subtitle = "Regression line reflects predictions from: outcome ~ treatment + baseline",
+  x = "Baseline Severity",
+  y = "Observed Outcome",
+  caption = paste0(
+    "Treatment effect (Active vs Placebo): ", round(coef(fit_naive)["trtaActive"], 2)
+  )
+)+
+
+
+  # Theme
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.caption = element_text(hjust = 0, size = 8, face = "italic")
+  )
+
+```
 
 ### Stratified Analysis by Trial
 
@@ -133,5 +173,82 @@ Note that all trial-specific intercepts are fairly similar (ranging from approxi
 
 The homogeneity in trial-specific intercepts suggests that a naively pooled model with a global intercept could be reasonable in this scenario. However, this remains a strong assumption — even small differences across trials can introduce bias if not properly accounted for. Stratifying by trial offers a more robust approach by explicitly modeling these differences, even when they appear minor.
 
+# Pooling Trials with Heterogeneous Baseline Risk
+
+In this example, we consider a scenario in which **trials differ in their distribution of baseline severity**. That is, each trial recruits patients with systematically different baseline risk profiles.
+
+## Simulating data
+
+
+```{r}
+#| message: false
+
+# Simulate 5 trials with 100 patients each (50 per arm)
+df <- simulate_trials(
+  n_trials = 5,
+  n_per_arm = 50,
+  baseline_mean_fn = function(trial_id) 15 + 20 * rbeta(1, shape1 = 2, shape2 = 5), 
+  beta_W = 0,     # no within-trial effect modification
+  beta_A = 0      # no across-trial effect modification
+)
+```
+
+
+```{r}
+#| message: false
+#| echo: false
+summarize_baseline_by_trial(df)
+```
+
 ### Random trial effects
+
+
+
+```{r}
+#| message: false
+#| echo: false
+#| fig-cap: "Model-Predicted and Observed Outcomes from Stratified Analysis by Treatment Group"
+#| label: fig-model-fit-stratified
+#| fig-width: 8
+#| fig-height: 6
+
+# Prepare new data for prediction
+new_data_strat <- expand.grid(
+  baseline = seq(min(df$baseline), max(df$baseline), length.out = 100),
+  trta = levels(df$trta),
+  trial = unique(df$trial)
+)
+
+# Get model predictions
+new_data_strat$pred <- predict(fit_stratified, newdata = new_data_strat)
+
+# Plot: Observed outcomes and model-predicted lines by treatment
+ggplot() +
+  # Model prediction lines (trial-stratified intercepts, shared slope & treatment effect)
+  geom_line(data = new_data_strat, aes(x = baseline, y = pred, group = trial), color = "black", linewidth = 1.2) +
+
+  # Observed data points colored by trial
+  geom_point(data = df, aes(x = baseline, y = outcome, color = trial), alpha = 0.5, size = 1.5) +
+
+  # Horizontal reference line
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray60") +
+
+  # Facet by treatment group
+  facet_wrap(~trta) +
+
+  # Labels
+  labs(
+    title = "Observed Outcomes and Model-Predicted Values by Treatment Group (Stratified Model)",
+    subtitle = "Regression line reflects predictions from: outcome ~ trial + treatment + baseline",
+    x = "Baseline Severity",
+    y = "Observed Outcome"
+  ) +
+
+  # Theme
+  theme_minimal() +
+  theme(
+    plot.caption = element_text(hjust = 0, size = 8, face = "italic"),
+    legend.position = "bottom"
+  )
+```
 

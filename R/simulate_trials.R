@@ -1,7 +1,7 @@
 simulate_trials <- function(
     n_trials = 10,
     n_per_arm = 50,
-    overall_baseline_mean = 25,
+    baseline_mean_fn = function(trial_id) rnorm(1, mean = 25, sd = 0),
     baseline_sd_fn = function(mean) 2 + 0.2 * mean,
     change_sd = 5,
     overall_active_change = -9.6,
@@ -14,7 +14,7 @@ simulate_trials <- function(
 
   data_list <- lapply(seq_len(n_trials), function(i) {
     # Step 1: trial-specific mean baseline (X̄_k), around overall mean
-    xk_mean <- rnorm(1, mean = overall_baseline_mean, sd = 3)
+    xk_mean <- baseline_mean_fn(i)
 
     # Step 2: trial-specific baseline SD
     xk_sd <- baseline_sd_fn(xk_mean)
