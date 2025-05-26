@@ -177,21 +177,21 @@ The homogeneity in trial-specific intercepts suggests that a naively pooled mode
 
 In this second scenario, we consider a setting in which trials differ in baseline severity and average outcome levels, as might occur when studies are conducted in distinct clinical environments or patient populations.
 
-## Simulating data
+## Simulating Data
 
 In this scenario, we simulate five clinical trials that are identical in design and treatment effect. However, **Trial 5 differs systematically from the others**:
 
-- It enrolls patients with **lower baseline severity** (mean = 17 vs. 25 in other trials)
-- It also exhibits **reduced overall disease progression** due to an added **negative intercept shift** (−15) applied equally to both treatment arms
+- It enrolls patients with **higher baseline severity** (mean = 35 vs. 25 in other trials)
+- It also exhibits **lower overall outcome levels**, due to an added **negative intercept shift** (−15) applied equally to both treatment arms
 
-This setup reflects a situation where one study is conducted in a distinct clinical setting with less severely affected patients and a milder disease trajectory.
+This setup reflects a situation where one trial includes a more severely affected population and reports systematically lower outcome scores, even though the treatment effect remains consistent across all trials.
 
 ```{r}
 #| message: false
 
 # Simulate 5 trials with 100 patients each (50 per arm)
 df <- simulate_trials(
-  baseline_means = c(25,25,25,25,17), # Different mean baselines across trials
+  baseline_means = c(25,25,25,25,35), # Different mean baselines across trials
   trial_intercepts = c(0,0,0,0,-15),
   n_per_arm = 50,
   beta_W = 0,     # no within-trial effect modification
@@ -333,9 +333,7 @@ This model yields the following treatment effect estimate  (`trtaActive`), which
 
 `r sprintf("Treatment effect: %.2f (95%% CI: %.2f to %.2f)", est_stratified, ci_stratified[1], ci_stratified[2])`
 
-Note that all trial-specific intercepts are fairly similar (ranging from approximately `r round(min(intercepts),2)` to `r round(max(intercepts),2)`), which suggests there is no strong 'trial effect' in the data. This is consistent with how the data were simulated — the underlying outcome-generating mechanism assumed comparable average outcomes across trials, apart from random noise.
-
-The homogeneity in trial-specific intercepts suggests that a naively pooled model with a global intercept could be reasonable in this scenario. However, this remains a strong assumption — even small differences across trials can introduce bias if not properly accounted for. Stratifying by trial offers a more robust approach by explicitly modeling these differences, even when they appear minor.
+Note that all trial-specific intercepts are no longer similar, and now range from approximately `r round(min(intercepts),2)` to `r round(max(intercepts),2)`. 
 
 
 ```{r}
