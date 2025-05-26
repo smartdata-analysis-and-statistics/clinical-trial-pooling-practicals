@@ -1,20 +1,27 @@
 simulate_trials <- function(
-    n_trials = 10,
+    baseline_means,              # Vector of baseline means (length = # trials)
     n_per_arm = 50,
-    baseline_mean_fn = function(trial_id) rnorm(1, mean = 25, sd = 0),
     baseline_sd_fn = function(mean) 2 + 0.2 * mean,
     change_sd = 5,
     overall_active_change = -9.6,
     overall_control_change = -7.8,
+    trial_intercepts = NULL,
     beta_W = 0, # within-trial effect modification
     beta_A = 0,   # across-trial effect modification
     seed = 2025
 ) {
   set.seed(seed)
 
+  n_trials <- length(baseline_means)
+
+  # Default: no shift
+  if (is.null(trial_intercepts)) {
+    trial_intercepts <- rep(0, n_trials)
+  }
+
   data_list <- lapply(seq_len(n_trials), function(i) {
     # Step 1: trial-specific mean baseline (X̄_k), around overall mean
-    xk_mean <- baseline_mean_fn(i)
+    xk_mean <- baseline_means[i]
 
     # Step 2: trial-specific baseline SD
     xk_sd <- baseline_sd_fn(xk_mean)
@@ -37,7 +44,7 @@ simulate_trials <- function(
 
     # Step 7: compute change using within-trial and across-trial terms
     error <- rnorm(2 * n_per_arm, mean = 0, sd = change_sd)
-    outcome <- baseline + overall_control_change + trt*treatment_effect + beta_W * x_centered + error
+    outcome <-  trial_intercepts[i] + baseline + overall_control_change + trt*treatment_effect + beta_W * x_centered + error
 
     data.frame(
       trial = paste0("Trial_", i),

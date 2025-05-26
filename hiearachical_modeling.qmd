@@ -3,7 +3,7 @@ title: "Hierarchical Modeling"
 format: html
 ---
 
-# Pooling Homogeneous Trials
+# Scenario 1: Pooling Homogeneous Trials
 
 In this example, we consider a scenario in which **all trials are homogeneous** — that is, they share similar designs, patient populations, and a consistent treatment effect.
 
@@ -25,9 +25,9 @@ source("R/simulate_trials.R")
 
 # Simulate 5 trials with 100 patients each (50 per arm)
 df <- simulate_trials(
-  n_trials = 5,
+  baseline_means = rep(25, 5) , # Common mean baseline
+  trial_intercepts = rep(0,5), # No heterogeneity in outcome levels
   n_per_arm = 50,
-  baseline_mean_fn = function(trial_id) 25, # Common mean baseline
   beta_W = 0,     # no within-trial effect modification
   beta_A = 0      # no across-trial effect modification
 )
@@ -49,7 +49,7 @@ summarize_baseline_by_trial(df)
 ```{r}
 #| message: false
 #| echo: false
-#| fig-cap: "Naive Pooled Analysis of Change from Baseline by Treatment Group"
+#| fig-cap: "Observed Change from Baseline in Scenario 1"
 #| label: fig-naive-pooling
 #| fig-width: 10
 #| fig-height: 8
@@ -58,7 +58,7 @@ mean_labels <- df %>%
     group_by(trta) %>%
     summarise(mean_change = mean(change, na.rm = TRUE)) %>%
     mutate(label = paste0("Mean change: ", round(mean_change, 1)))
-plot_change_by_treatment_with_means(df)
+plot_change_by_treatment_with_means(df, title = "Change from Baseline by Treatment Group (Scenario 1)")
 ```
 
 The plot shows that:
@@ -173,9 +173,9 @@ Note that all trial-specific intercepts are fairly similar (ranging from approxi
 
 The homogeneity in trial-specific intercepts suggests that a naively pooled model with a global intercept could be reasonable in this scenario. However, this remains a strong assumption — even small differences across trials can introduce bias if not properly accounted for. Stratifying by trial offers a more robust approach by explicitly modeling these differences, even when they appear minor.
 
-# Pooling Trials with Heterogeneous Baseline Risk
+# Scenario 2: Pooling Trials with Study-Level differences
 
-In this example, we consider a scenario in which **trials differ in their distribution of baseline severity**. That is, each trial recruits patients with systematically different baseline risk profiles.
+In this example, we consider a scenario in which trials differ in their average outcome level due to systematic differences across settings or populations.
 
 ## Simulating data
 
@@ -185,9 +185,9 @@ In this example, we consider a scenario in which **trials differ in their distri
 
 # Simulate 5 trials with 100 patients each (50 per arm)
 df <- simulate_trials(
-  n_trials = 5,
+  baseline_means = c(25,25,25,25,17), # Different mean baselines across trials
+  trial_intercepts = c(0,0,0,0,-15),
   n_per_arm = 50,
-  baseline_mean_fn = function(trial_id) 15 + 20 * rbeta(1, shape1 = 2, shape2 = 5), 
   beta_W = 0,     # no within-trial effect modification
   beta_A = 0      # no across-trial effect modification
 )
@@ -200,8 +200,136 @@ df <- simulate_trials(
 summarize_baseline_by_trial(df)
 ```
 
-### Random trial effects
 
+@fig-naive-pooling-scenario2 visualizes the relationship between baseline severity and change from baseline within each treatment arm using a naively pooled analysis.
+
+
+```{r}
+#| message: false
+#| echo: false
+#| fig-cap: "Observed Change from Baseline in Scenario 2. Trial 5 differs from the others by having systematically lower baseline severity (mean = 17) and lower outcome levels for both treatment and control groups due to an added intercept shift of −15."
+#| label: fig-naive-pooling-scenario2
+#| fig-width: 10
+#| fig-height: 8
+mean_labels <- df %>%
+    group_by(trta) %>%
+    summarise(mean_change = mean(change, na.rm = TRUE)) %>%
+    mutate(label = paste0("Mean change: ", round(mean_change, 1)))
+plot_change_by_treatment_with_means(df, title = "Change from Baseline by Treatment Group (Scenario 2)")
+```
+
+The plot shows that:
+
+- The mean change in the active group is `r mean_labels %>% filter(trta == "Active") %>% pull(mean_change) %>% round(digits = 1)`
+- The mean change in the control group is `r mean_labels %>% filter(trta == "Control") %>% pull(mean_change) %>% round(digits = 1)`
+
+**Question for Discussion**: Can we interpret the pooled treatment effect as simply the difference in means?
+
+
+### Naive Analysis
+
+We again begin by estimating the pooled treatment effect using a simple regression model that adjusts for baseline severity but ignores trial structure. 
+
+```{r}
+#| message: false
+fit_naive <- glm(outcome ~ trta + baseline, data = df)
+```
+
+```{r}
+#| echo: false
+est_naive <- coef(fit_naive)["trtaActive"]
+ci_naive  <- confint.default(fit_naive)["trtaActive", ]
+```
+
+In this naive model, the estimated treatment effect is: 
+
+`r sprintf("Treatment effect: %.2f (95%% CI: %.2f to %.2f)", est_naive, ci_naive[1], ci_naive[2])`
+
+The figure below visualizes `fit_naive` by showing predicted outcomes across baseline severity values for each treatment group, alongside the observed data.
+
+```{r}
+#| message: false
+#| echo: false
+#| fig-cap: "Model-Predicted and Observed Outcomes from Naive Pooled Analysis by Treatment Group"
+#| label: fig-model-fit-naive-scenario2
+#| fig-width: 8
+#| fig-height: 6
+
+# Prepare new data for prediction
+new_data <- expand.grid(
+  baseline = seq(min(df$baseline), max(df$baseline), length.out = 100),
+  trta = levels(df$trta)
+)
+
+# Get model predictions
+new_data$pred <- predict(fit_naive, newdata = new_data)
+
+# Plot: Observed outcomes and model-predicted lines by treatment
+ggplot() +
+  # Model prediction lines (same slope, treatment-specific intercepts)
+  geom_line(data = new_data, aes(x = baseline, y = pred), color = "black", linewidth  = 1.2) +
+
+  # Observed data points
+  geom_point(data = df, aes(x = baseline, y = outcome, color = trial), alpha = 0.4, size = 1.5) +
+
+  # Horizontal line at 0
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray60") +
+
+  # Facet by treatment
+  facet_wrap(~trta) +
+
+  # Labels
+  labs(
+  title = "Observed Outcomes and Model-Predicted Values by Treatment Group",
+  subtitle = "Regression line reflects predictions from: outcome ~ treatment + baseline",
+  x = "Baseline Severity",
+  y = "Observed Outcome",
+  caption = paste0(
+    "Treatment effect (Active vs Placebo): ", round(coef(fit_naive)["trtaActive"], 2)
+  )
+)+
+
+
+  # Theme
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.caption = element_text(hjust = 0, size = 8, face = "italic")
+  )
+
+```
+
+### Stratified Analysis by Trial
+
+Next, we fit a stratified model that accounts for trial-specific intercepts by including trial as a fixed effect (without a global intercept).  This approach allows each trial to have its own baseline level of the outcome, effectively adjusting for differences in average outcomes across trials.
+
+```{r}
+#| message: false
+((fit_stratified <- glm(outcome ~ -1 + trial + trta + baseline, data = df)))
+```
+
+
+
+```{r}
+#| echo: false
+est_stratified <- coef(fit_stratified)["trtaActive"]
+ci_stratified  <- confint.default(fit_stratified)["trtaActive", ]
+
+# Extract all coefficients related to trial intercepts
+intercepts <- coef(fit_stratified)[grep("^trial", names(coef(fit_stratified)))]
+
+# Get the minimum and maximum values
+min_intercept <- min(intercepts)
+max_intercept <- max(intercepts)
+```
+
+This model yields the following treatment effect estimate  (`trtaActive`), which is adjusted for trial-level differences and baseline covariates.
+
+`r sprintf("Treatment effect: %.2f (95%% CI: %.2f to %.2f)", est_stratified, ci_stratified[1], ci_stratified[2])`
+
+Note that all trial-specific intercepts are fairly similar (ranging from approximately `r round(min(intercepts),2)` to `r round(max(intercepts),2)`), which suggests there is no strong 'trial effect' in the data. This is consistent with how the data were simulated — the underlying outcome-generating mechanism assumed comparable average outcomes across trials, apart from random noise.
+
+The homogeneity in trial-specific intercepts suggests that a naively pooled model with a global intercept could be reasonable in this scenario. However, this remains a strong assumption — even small differences across trials can introduce bias if not properly accounted for. Stratifying by trial offers a more robust approach by explicitly modeling these differences, even when they appear minor.
 
 
 ```{r}
@@ -251,4 +379,9 @@ ggplot() +
     legend.position = "bottom"
   )
 ```
+
+
+### Random trial effects
+
+
 

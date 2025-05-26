@@ -1,6 +1,6 @@
 library(ggplot2)
 
-plot_change_by_treatment_with_means <- function(df) {
+plot_change_by_treatment_with_means <- function(df, title) {
   # Precompute mean labels
   mean_labels <- df %>%
     group_by(trta) %>%
@@ -17,7 +17,7 @@ plot_change_by_treatment_with_means <- function(df) {
       inherit.aes = FALSE
     ) +
     labs(
-      title = "Change from Baseline by Treatment Group",
+      title = title,
       subtitle = "No within- or across-trial effect modification",
       x = "Baseline Severity",
       y = "Change from Baseline"
