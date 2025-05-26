@@ -1,0 +1,15 @@
+Package: clinicalTrialPoolingPracticals
+Title: Advanced Pooled Analyses for Clinical Trial Statisticians
+Version: 0.1.0
+Authors@R: 
+    person("Thomas", "Debray", email = "tdebray@fromdatatowisdom.com", role = c("aut", "cre"))
+Description: A Quarto-based website project demonstrating best practices for pooling clinical trials using R.
+Depends: 
+    R (>= 4.1.0)
+Imports:
+    dplyr,
+    tidyr,
+    ggplot2,
+    quarto,
+    tidyverse,
+    kableExtra

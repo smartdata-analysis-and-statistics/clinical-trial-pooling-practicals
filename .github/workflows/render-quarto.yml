@@ -23,9 +23,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libgit2-dev
 
-      - name: Install R packages
-        run: |
-          Rscript -e 'install.packages(c("quarto", "tidyverse", "ggplot2", "dplyr", "tidyr", "kableExtra"), repos = "https://cloud.r-project.org")'
+      - name: Install R package dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
 
       - name: Render site
         run: quarto render
