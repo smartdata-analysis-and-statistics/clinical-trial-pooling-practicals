@@ -175,10 +175,16 @@ The homogeneity in trial-specific intercepts suggests that a naively pooled mode
 
 # Scenario 2: Pooling Trials with Study-Level differences
 
-In this example, we consider a scenario in which trials differ in their average outcome level due to systematic differences across settings or populations.
+In this second scenario, we consider a setting in which trials differ in baseline severity and average outcome levels, as might occur when studies are conducted in distinct clinical environments or patient populations.
 
 ## Simulating data
 
+In this scenario, we simulate five clinical trials that are identical in design and treatment effect. However, **Trial 5 differs systematically from the others**:
+
+- It enrolls patients with **lower baseline severity** (mean = 17 vs. 25 in other trials)
+- It also exhibits **reduced overall disease progression** due to an added **negative intercept shift** (−15) applied equally to both treatment arms
+
+This setup reflects a situation where one study is conducted in a distinct clinical setting with less severely affected patients and a milder disease trajectory.
 
 ```{r}
 #| message: false
