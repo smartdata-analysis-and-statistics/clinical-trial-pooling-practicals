@@ -179,20 +179,20 @@ In this second scenario, we consider a setting in which trials differ in baselin
 
 ## Simulating Data
 
-In this scenario, we simulate five clinical trials that are identical in design and treatment effect. However, **Trial 5 differs systematically from the others**:
+In this scenario, we simulate five clinical trials that are identical in design and treatment effect. However, **Trials 4 and 5** differ systematically from Trials 1–3:
 
-- It enrolls patients with **higher baseline severity** (mean = 35 vs. 25 in other trials)
-- It also exhibits **lower overall outcome levels**, due to an added **negative intercept shift** (−15) applied equally to both treatment arms
+- Trial 4 enrolls patients with moderately higher baseline severity (mean = 30) and includes a −10 intercept shift, lowering overall outcomes.
+- Trial 5 enrolls patients with the highest baseline severity (mean = 35) and includes a stronger −15 intercept shift to further reduce outcome levels.
 
-This setup reflects a situation where one trial includes a more severely affected population and reports systematically lower outcome scores, even though the treatment effect remains consistent across all trials.
+These shifts simulate trials that include more severely affected populations and report lower outcome scores across both treatment arms, despite having the same true treatment effect. This setup reflects a realistic source of between-trial heterogeneity.
 
 ```{r}
 #| message: false
 
 # Simulate 5 trials with 100 patients each (50 per arm)
 df <- simulate_trials(
-  baseline_means = c(25,25,25,25,35), # Different mean baselines across trials
-  trial_intercepts = c(0,0,0,0,-15),
+  baseline_means = c(25, 25, 25, 30, 35),     # Different mean baselines across trials
+  trial_intercepts = c(0, 0, 0, -10, -15),    # Outcome levels lowered in Trials 4 and 5
   n_per_arm = 50,
   beta_W = 0,     # no within-trial effect modification
   beta_A = 0      # no across-trial effect modification
@@ -234,7 +234,7 @@ The plot shows that:
 
 ### Naive Analysis
 
-We again begin by estimating the pooled treatment effect using a simple regression model that adjusts for baseline severity but ignores trial structure. 
+We again begin by estimating the pooled treatment effect using a simple regression model that adjusts for baseline severity but ignores potential heterogeneity across trials — that is, it assumes all patients come from a single trial.
 
 ```{r}
 #| message: false
@@ -244,12 +244,15 @@ fit_naive <- glm(outcome ~ trta + baseline, data = df)
 ```{r}
 #| echo: false
 est_naive <- coef(fit_naive)["trtaActive"]
+se_naive <- sqrt(vcov(fit_naive)["trtaActive", "trtaActive"])
 ci_naive  <- confint.default(fit_naive)["trtaActive", ]
 ```
 
-In this naive model, the estimated treatment effect is: 
+In this naive model, we obtain:
 
 `r sprintf("Treatment effect: %.2f (95%% CI: %.2f to %.2f)", est_naive, ci_naive[1], ci_naive[2])`
+
+This result suggests a beneficial treatment effect, but it ignores systematic differences between trials — such as varying patient populations or outcome levels — which can lead to biased estimates.
 
 The figure below visualizes `fit_naive` by showing predicted outcomes across baseline severity values for each treatment group, alongside the observed data.
 
@@ -307,18 +310,19 @@ ggplot() +
 
 ### Stratified Analysis by Trial
 
-Next, we fit a stratified model that accounts for trial-specific intercepts by including trial as a fixed effect (without a global intercept).  This approach allows each trial to have its own baseline level of the outcome, effectively adjusting for differences in average outcomes across trials.
+To better account for between-trial differences, we now fit a stratified regression model by including trial-specific intercepts (i.e., one intercept per trial):
 
 ```{r}
 #| message: false
 ((fit_stratified <- glm(outcome ~ -1 + trial + trta + baseline, data = df)))
 ```
 
-
+This model allows each trial to have its own average outcome level at baseline, while still estimating a common treatment effect and adjusting for baseline severity.
 
 ```{r}
 #| echo: false
 est_stratified <- coef(fit_stratified)["trtaActive"]
+se_stratified <- sqrt(vcov(fit_stratified)["trtaActive", "trtaActive"])
 ci_stratified  <- confint.default(fit_stratified)["trtaActive", ]
 
 # Extract all coefficients related to trial intercepts
@@ -329,63 +333,104 @@ min_intercept <- min(intercepts)
 max_intercept <- max(intercepts)
 ```
 
-This model yields the following treatment effect estimate  (`trtaActive`), which is adjusted for trial-level differences and baseline covariates.
-
-`r sprintf("Treatment effect: %.2f (95%% CI: %.2f to %.2f)", est_stratified, ci_stratified[1], ci_stratified[2])`
-
-Note that all trial-specific intercepts are no longer similar, and now range from approximately `r round(min(intercepts),2)` to `r round(max(intercepts),2)`. 
+Let’s visualize the stratified model predictions to understand how trial-specific baselines affect the outcome estimates.
 
 
 ```{r}
 #| message: false
-#| echo: false
-#| fig-cap: "Model-Predicted and Observed Outcomes from Stratified Analysis by Treatment Group"
+#| fig-cap: "Observed and model-predicted outcomes by treatment group, with trial-specific intercepts. Each line represents a trial-level regression adjusted for baseline severity."
 #| label: fig-model-fit-stratified
 #| fig-width: 8
 #| fig-height: 6
-
-# Prepare new data for prediction
-new_data_strat <- expand.grid(
-  baseline = seq(min(df$baseline), max(df$baseline), length.out = 100),
-  trta = levels(df$trta),
-  trial = unique(df$trial)
-)
-
-# Get model predictions
-new_data_strat$pred <- predict(fit_stratified, newdata = new_data_strat)
-
-# Plot: Observed outcomes and model-predicted lines by treatment
-ggplot() +
-  # Model prediction lines (trial-stratified intercepts, shared slope & treatment effect)
-  geom_line(data = new_data_strat, aes(x = baseline, y = pred, group = trial), color = "black", linewidth = 1.2) +
-
-  # Observed data points colored by trial
-  geom_point(data = df, aes(x = baseline, y = outcome, color = trial), alpha = 0.5, size = 1.5) +
-
-  # Horizontal reference line
-  geom_hline(yintercept = 0, linetype = "dashed", color = "gray60") +
-
-  # Facet by treatment group
-  facet_wrap(~trta) +
-
-  # Labels
-  labs(
-    title = "Observed Outcomes and Model-Predicted Values by Treatment Group (Stratified Model)",
-    subtitle = "Regression line reflects predictions from: outcome ~ trial + treatment + baseline",
-    x = "Baseline Severity",
-    y = "Observed Outcome"
-  ) +
-
-  # Theme
-  theme_minimal() +
-  theme(
-    plot.caption = element_text(hjust = 0, size = 8, face = "italic"),
-    legend.position = "bottom"
-  )
+plot_outcome_predictions_by_treatment(fit_stratified)
 ```
 
+This plot illustrates how each trial follows its own fitted regression line, while the treatment effect (i.e., the difference between active and control) remains consistent across trials.
+
+As shown in Figure @fig-model-fit-stratified, the trial-specific intercepts range from approximately `r round(min(intercepts),2)` to `r round(max(intercepts),2)`, reflecting substantial differences in outcome levels across trials at baseline. These shifts arise from differences in the trial populations and illustrate why a naive pooled analysis (which ignores these differences) is inappropriate.
+
+This substantial variation indicates that a naive pooling approach is no longer appropriate. Stratifying by trial ensures these baseline differences are accounted for, improving the validity of the treatment effect estimate.
+
+The naive model estimated a treatment effect of `r sprintf("%.2f", est_naive)` (SE = `r sprintf("%.2f", se_naive)`), without accounting for trial heterogeneity. In contrast, the stratified model — which adjusts for between-trial differences — yields a more precise estimate of `r sprintf("%.2f", est_stratified)` (SE = `r sprintf("%.2f", se_stratified )`).
+
+
+💡 **Reflection** : Why might ignoring trial structure lead to misleading conclusions about treatment effects? In what types of studies is stratification especially important?
 
 ### Random trial effects
 
+Instead of estimating a separate fixed intercept for each trial, we can model **trial-specific intercepts as random effects**. This approach assumes that the intercepts for each trial are not unique parameters but are instead drawn from a **common normal distribution**. In practice, this means we estimate only the mean and standard deviation of the trial intercepts — reducing the number of parameters and increasing efficiency, especially when the number of trials is large or when each trial has limited data.
+```{r}
+#| message: false
+library(lme4)
+((fit_random <- lmer(outcome ~  trta + baseline + (1|trial), data = df)))
+```
+
+```{r}
+#| echo: false
+est_random <-  fixef(fit_random)["trtaActive"]
+se_random <- sqrt(vcov(fit_random)["trtaActive", "trtaActive"])
+```
+
+Recall the stratified model — which adjusts for between-trial differences — yielded a treatment effect of `r sprintf("%.2f", est_stratified)` (SE = `r sprintf("%.2f", se_stratified )`). The random effects model produces a similar point estimate of `r sprintf("%.2f", est_random)`, with the same standard error (SE = `r sprintf("%.2f", se_random )`). 
+
+Although the results align in this example, the two approaches rely on different assumptions — and in other contexts, these assumptions can materially affect the estimated treatment effect.
+
+The global fixed-effect estimates from the random-effects model are:
+
+```{r}
+fixef(fit_random)
+```
+
+These represent the overall average outcome level, treatment effect, and baseline slope across all trials.
+
+We can extract the trial-specific intercept deviations from the global mean intercept (`r sprintf("%.2f", fixef(fit_random)["(Intercept)"] )`) as follows. 
+
+```{r}
+ranef(fit_random)
+```
+
+By design, the mean of these random effects is zero.
+
+While the random effects approach is attractive for its parsimony and ability to borrow strength across trials, it can introduce bias in the trial-specific intercept terms (and thereby introduce bias in the pooled treatment effect). In the table below, we compare the intercepts estimated by the stratified model (fixed effects) with those from the random effects model.
+
+```{r}
+#| echo: FALSE
+#| tbl-cap: "Comparison of Trial-Specific Intercepts Estimated from Stratified and Random Effects Models."
+#| label: tbl-fixed-vs-random-intercepts
+# Stratified (fixed effects) model
+intercepts_strat <- coef(fit_stratified)[grep("^trial", names(coef(fit_stratified)))]
+
+# Extract trial names from names
+trial_names <- gsub("trial", "", names(intercepts_strat))
+
+# Random effects model: extract BLUPs (Best Linear Unbiased Predictors)
+intercepts_random <- coef(fit_random)$trial[,"(Intercept)"]
+
+# Combine into a data.frame for plotting
+intercepts_df <- data.frame(
+  trial = trial_names,
+  stratified = as.numeric(intercepts_strat),
+  random = intercepts_random,
+  stratified_txt = sprintf("%.2f", as.numeric(intercepts_strat)),
+  random_txt = sprintf("%.2f", intercepts_random)
+)
+sd_stratified <- sd(intercepts_df$stratified)
+sd_random <- sd(intercepts_df$random)
+
+
+# Display: Stratified vs. Random Intercepts
+intercepts_df %>% select(trial, stratified_txt, random_txt) %>%
+    kable(format = "html", escape = FALSE,
+          col.names = c(
+            "Trial",
+            "Intercept (Stratified Trial Effects)",
+            "Intercept (Random Trial Effects)"
+          )) %>%
+    kable_styling(full_width = FALSE, position = "left", bootstrap_options = c("striped", "hover"))
+```
+
+As shown in @tbl-fixed-vs-random-intercepts, the estimated trial intercepts differ slightly between the stratified model and the random-intercepts model. The stratified model estimates a separate fixed intercept for each trial, capturing trial-specific baseline differences directly. In contrast, the random-effects model assumes that intercepts arise from a common distribution, and applies shrinkage toward the overall mean.
+
+This shrinkage reduces variability across trials and can lead to bias in the estimated intercepts -- particularly if true trial effects differ systematically. This is reflected in the standard deviations of the trial intercepts: `r sprintf("%.2f", sd_stratified)` for the stratified model versus `r sprintf("%.2f", sd_random)` under the random-effects model, confirming a modest degree of shrinkage. Although this reduction in variability appears small, even modest shrinkage can introduce bias in the treatment effect estimate -- especially when trial-level outcome differences are correlated with treatment assignment or patient characteristics. This risk is why, in pooled analyses and multi-trial synthesis, stratifying by trial using fixed effects is often preferred. Fixed-effect models estimate each trial’s intercept independently, thus preserving true baseline differences and avoiding bias introduced by shrinkage.
 
 
