@@ -207,13 +207,18 @@ summarize_baseline_by_trial(df)
 ```
 
 
-@fig-naive-pooling-scenario2 visualizes the relationship between baseline severity and change from baseline within each treatment arm using a naively pooled analysis.
+@fig-naive-pooling-scenario2 visualizes the relationship between baseline severity and change from baseline within each treatment arm. The figure shows that:
+
+- Patients with higher baseline severity tend to show larger improvements (greater negative change).
+- The active treatment group consistently shows a greater mean improvement than the control group, across all levels of baseline severity.
+
+Although no effect modification was simulated in this scenario, the figure illustrates how even pooled data can suggest patterns that may reflect underlying trial design or population heterogeneity.
 
 
 ```{r}
 #| message: false
 #| echo: false
-#| fig-cap: "Observed Change from Baseline in Scenario 2. Trial 5 differs from the others by having systematically lower baseline severity (mean = 17) and lower outcome levels for both treatment and control groups due to an added intercept shift of −15."
+#| fig-cap: "Observed Change from Baseline in Scenario 2."
 #| label: fig-naive-pooling-scenario2
 #| fig-width: 10
 #| fig-height: 8
@@ -223,13 +228,6 @@ mean_labels <- df %>%
     mutate(label = paste0("Mean change: ", round(mean_change, 1)))
 plot_change_by_treatment_with_means(df, title = "Change from Baseline by Treatment Group (Scenario 2)")
 ```
-
-The plot shows that:
-
-- The mean change in the active group is `r mean_labels %>% filter(trta == "Active") %>% pull(mean_change) %>% round(digits = 1)`
-- The mean change in the control group is `r mean_labels %>% filter(trta == "Control") %>% pull(mean_change) %>% round(digits = 1)`
-
-**Question for Discussion**: Can we interpret the pooled treatment effect as simply the difference in means?
 
 
 ### Naive Analysis
