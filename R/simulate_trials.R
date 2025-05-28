@@ -3,8 +3,8 @@ simulate_trials <- function(
     n_per_arm = 50,
     baseline_sd_fn = function(mean) 2 + 0.2 * mean,
     change_sd = 5,
-    overall_active_change = -9.6,
-    overall_control_change = -7.8,
+    cfb_active,
+    cfb_control,
     trial_intercepts = NULL,
     beta_W = 0, # within-trial effect modification
     beta_A = 0,   # across-trial effect modification
@@ -27,7 +27,7 @@ simulate_trials <- function(
     xk_sd <- baseline_sd_fn(xk_mean)
 
     # Step 3: trial-specific treatment effect (α + βA * X̄_k)
-    treatment_effect <- (overall_active_change - overall_control_change) +
+    treatment_effect <- (cfb_active[i] - cfb_control[i]) +
       beta_A * xk_mean  # ecological effect modifies difference
 
     # Step 4: simulate treatment (1 = active, 0 = control)
@@ -44,7 +44,7 @@ simulate_trials <- function(
 
     # Step 7: compute change using within-trial and across-trial terms
     error <- rnorm(2 * n_per_arm, mean = 0, sd = change_sd)
-    outcome <-  trial_intercepts[i] + baseline + overall_control_change + trt*treatment_effect + beta_W * x_centered + error
+    outcome <-  trial_intercepts[i] + baseline + cfb_control[i] + trt*treatment_effect + beta_W * x_centered + error
 
     data.frame(
       trial = paste0("Trial_", i),

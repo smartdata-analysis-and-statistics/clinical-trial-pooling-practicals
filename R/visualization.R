@@ -46,7 +46,7 @@ plot_outcome_predictions_by_treatment <- function(model) {
   # Plot: Observed outcomes and model-predicted lines by treatment
   ggplot() +
     # Model prediction lines (trial-stratified intercepts, shared slope & treatment effect)
-    geom_line(data = new_data_strat, aes(x = baseline, y = pred, group = trial), color = "black", linewidth = 1.2) +
+    geom_line(data = new_data_strat, aes(x = baseline, y = pred, group = trial, color = trial), linewidth = 1.2) +
 
     # Observed data points colored by trial
     geom_point(data = df, aes(x = baseline, y = outcome, color = trial), alpha = 0.5, size = 1.5) +

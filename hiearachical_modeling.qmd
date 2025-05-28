@@ -27,6 +27,8 @@ source("R/simulate_trials.R")
 df <- simulate_trials(
   baseline_means = rep(25, 5) , # Common mean baseline
   trial_intercepts = rep(0,5), # No heterogeneity in outcome levels
+  cfb_active = rep(-9.6,5),
+  cfb_control = rep(-7.8,5),
   n_per_arm = 50,
   beta_W = 0,     # no within-trial effect modification
   beta_A = 0      # no across-trial effect modification
@@ -181,6 +183,7 @@ In this second scenario, we consider a setting in which trials differ in baselin
 
 In this scenario, we simulate five clinical trials that are identical in design and treatment effect. However, **Trials 4 and 5** differ systematically from Trials 1–3:
 
+- Trial 1 enrolls patients with the lowest baseline severity (mean = 20) and has a +5 intercept shift, indicating higher overall outcomes.
 - Trial 4 enrolls patients with moderately higher baseline severity (mean = 30) and includes a −10 intercept shift, lowering overall outcomes.
 - Trial 5 enrolls patients with the highest baseline severity (mean = 35) and includes a stronger −15 intercept shift to further reduce outcome levels.
 
@@ -191,8 +194,10 @@ These shifts simulate trials that include more severely affected populations and
 
 # Simulate 5 trials with 100 patients each (50 per arm)
 df <- simulate_trials(
-  baseline_means = c(25, 25, 25, 30, 35),     # Different mean baselines across trials
-  trial_intercepts = c(0, 0, 0, -10, -15),    # Outcome levels lowered in Trials 4 and 5
+  baseline_means = c(20, 25, 25, 30, 35),     # Different mean baselines across trials
+  trial_intercepts = c(5, 0, 0, -10, -15),    # Outcome levels lowered in Trials 4 and 5
+  cfb_active = rep(-9.6,5),
+  cfb_control = rep(-7.8,5),
   n_per_arm = 50,
   beta_W = 0,     # no within-trial effect modification
   beta_A = 0      # no across-trial effect modification
@@ -303,8 +308,9 @@ ggplot() +
     legend.position = "none",
     plot.caption = element_text(hjust = 0, size = 8, face = "italic")
   )
-
 ```
+
+
 
 ### Stratified Analysis by Trial
 
@@ -345,7 +351,7 @@ plot_outcome_predictions_by_treatment(fit_stratified)
 
 This plot illustrates how each trial follows its own fitted regression line, while the treatment effect (i.e., the difference between active and control) remains consistent across trials.
 
-As shown in Figure @fig-model-fit-stratified, the trial-specific intercepts range from approximately `r round(min(intercepts),2)` to `r round(max(intercepts),2)`, reflecting substantial differences in outcome levels across trials at baseline. These shifts arise from differences in the trial populations and illustrate why a naive pooled analysis (which ignores these differences) is inappropriate.
+As shown in @fig-model-fit-stratified, the trial-specific intercepts range from approximately `r round(min(intercepts),2)` to `r round(max(intercepts),2)`, reflecting substantial differences in outcome levels across trials at baseline. These shifts arise from differences in the trial populations and illustrate why a naive pooled analysis (which ignores these differences) is inappropriate.
 
 This substantial variation indicates that a naive pooling approach is no longer appropriate. Stratifying by trial ensures these baseline differences are accounted for, improving the validity of the treatment effect estimate.
 
@@ -431,4 +437,11 @@ As shown in @tbl-fixed-vs-random-intercepts, the estimated trial intercepts diff
 
 This shrinkage reduces variability across trials and can lead to bias in the estimated intercepts -- particularly if true trial effects differ systematically. This is reflected in the standard deviations of the trial intercepts: `r sprintf("%.2f", sd_stratified)` for the stratified model versus `r sprintf("%.2f", sd_random)` under the random-effects model, confirming a modest degree of shrinkage. Although this reduction in variability appears small, even modest shrinkage can introduce bias in the treatment effect estimate -- especially when trial-level outcome differences are correlated with treatment assignment or patient characteristics. This risk is why, in pooled analyses and multi-trial synthesis, stratifying by trial using fixed effects is often preferred. Fixed-effect models estimate each trial’s intercept independently, thus preserving true baseline differences and avoiding bias introduced by shrinkage.
 
+# Investigating heterogeneity of treatment effect
 
+GIven the data observed in @fig-naive-pooling-scenario2, we may think that there is effect modification by baseline severity, with the treatment effect appearing larger in patients with higher baseline severity. We can estiamte this as follows:
+
+```{r}
+#| message: false
+fit_naive_hte <- glm(outcome ~ trta + baseline + trta*baseline, data = df)
+```
