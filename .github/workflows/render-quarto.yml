@@ -34,8 +34,8 @@ jobs:
       - name: Install R package dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
 
-      - name: Render site
-        run: quarto render
+      - name: Render only HTML
+        run: quarto render --to html
 
       - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
