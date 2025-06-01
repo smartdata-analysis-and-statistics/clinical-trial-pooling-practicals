@@ -55,7 +55,7 @@ simulate_trials <- function(
       baseline +
       cfb +
       cfb_tx + # Add within-study interaction
-      beta_A * xk_mean +
+      beta_A * (xk_mean - mean(baseline_means)) +
       error
 
     data.frame(

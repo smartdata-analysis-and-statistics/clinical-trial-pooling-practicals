@@ -171,8 +171,8 @@ df <- simulate_trials(
   cfb_active = rep(-9.6,5),
   cfb_control = rep(-7.8,5),
   n_per_arm = 50,
-  beta_W = c(0, -0.05, -0.1, -0.15, -0.2),  
-  beta_A = 0.1,
+  beta_W = rep(-0.15,5),  
+  beta_A = 0.35,
   seed = 2025
 )
 ```
@@ -260,13 +260,19 @@ Alternatively, we can fit:
 
 ```{r}
 #| eval: FALSE
-glm(outcome ~ -1 + trial + baseline:trial + trt:trial + xk_mean:trt + cbase:trt , data = df)
+lmer(
+  outcome ~ -1 + trial + trt + trial:baseline + trt:cbase +xk_mean:trt+
+    (0 + trt | trial) + (0 + trt:cbase | trial),
+  data = df
+)
 ```
 
 In this formula:
 
 - `xk_mean:trt`: Common effect for study-level confounding
-- `cbase:trt`: Common within-study interaction between baseline and treatment
+- `trt:cbase`: Pooled within-study interaction between baseline and treatment
+- ` (0 + trt | trial)`: Random treatment effects
+- `(0 + trt:cbase | trial)`: Random interaction effects
 
 
 

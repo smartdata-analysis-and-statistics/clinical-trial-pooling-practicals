@@ -457,15 +457,15 @@ These shifts simulate trials that include more severely affected populations and
 
 ```{r}
 #| message: false
-
 df <- simulate_trials(
   baseline_means = c(20, 25, 25, 30, 35),     
   trial_intercepts = c(5, 0, 0, -10, -15),
   cfb_active = rep(-9.6,5),
   cfb_control = rep(-7.8,5),
   n_per_arm = 50,
-  beta_W = c(0, -0.05, -0.1, -0.15, -0.2),  
-  beta_A = 0.1
+  beta_W = rep(-0.15,5),  
+  beta_A = 0.35,
+  seed = 2025
 )
 ```
 
