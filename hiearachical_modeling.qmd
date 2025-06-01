@@ -29,9 +29,7 @@ df <- simulate_trials(
   trial_intercepts = rep(0,5), # No heterogeneity in outcome levels
   cfb_active = rep(-9.6,5),
   cfb_control = rep(-7.8,5),
-  n_per_arm = 50,
-  beta_W = 0,     # no within-trial effect modification
-  beta_A = 0      # no across-trial effect modification
+  n_per_arm = 50
 )
 ```
 
@@ -60,15 +58,14 @@ mean_labels <- df %>%
     group_by(trta) %>%
     summarise(mean_change = mean(change, na.rm = TRUE)) %>%
     mutate(label = paste0("Mean change: ", round(mean_change, 1)))
-plot_change_by_treatment_with_means(df, title = "Change from Baseline by Treatment Group (Scenario 1)")
+plot_change_by_treatment_with_means(df, title = "Change from Baseline by Treatment Group (Scenario 1)",
+                                    subtitle = "No systematic differences across trials in baseline severity or treatment effect")
 ```
 
 The plot shows that:
 
 - The mean change in the active group is `r mean_labels %>% filter(trta == "Active") %>% pull(mean_change) %>% round(digits = 1)`
 - The mean change in the control group is `r mean_labels %>% filter(trta == "Control") %>% pull(mean_change) %>% round(digits = 1)`
-
-**Question for Discussion**: Can we interpret the pooled treatment effect as simply the difference in means?
 
 ### Naive Analysis
 
@@ -175,32 +172,31 @@ Note that all trial-specific intercepts are fairly similar (ranging from approxi
 
 The homogeneity in trial-specific intercepts suggests that a naively pooled model with a global intercept could be reasonable in this scenario. However, this remains a strong assumption — even small differences across trials can introduce bias if not properly accounted for. Stratifying by trial offers a more robust approach by explicitly modeling these differences, even when they appear minor.
 
-# Scenario 2: Pooling Trials with Study-Level differences
+# Scenario 2: Pooling Trials with heterogeneous baseline risk
 
 In this second scenario, we consider a setting in which trials differ in baseline severity and average outcome levels, as might occur when studies are conducted in distinct clinical environments or patient populations.
 
 ## Simulating Data
 
-In this scenario, we simulate five clinical trials that are identical in design and treatment effect. However, **Trials 4 and 5** differ systematically from Trials 1–3:
+In this scenario, we simulate five clinical trials that share a **common treatment effect**. However, the trials differ systematically in terms of participant eligibility criteria and overall prognosis:
 
-- Trial 1 enrolls patients with the lowest baseline severity (mean = 20) and has a +5 intercept shift, indicating higher overall outcomes.
-- Trial 4 enrolls patients with moderately higher baseline severity (mean = 30) and includes a −10 intercept shift, lowering overall outcomes.
-- Trial 5 enrolls patients with the highest baseline severity (mean = 35) and includes a stronger −15 intercept shift to further reduce outcome levels.
+- Trial 1 enrolls patients with the lowest baseline severity (mean = 20) and has a +5 intercept shift, resulting in higher overall outcome scores.
+- Trial 4 includes patients with moderately higher baseline severity (mean = 30) and includes a −10 intercept shift,  reducing overall outcome scores.
+- Trial 5 involves the most severely affected patients (mean baseline = 35) and applies a −15 intercept shift, resulting in even lower outcome levels.
 
-These shifts simulate trials that include more severely affected populations and report lower outcome scores across both treatment arms, despite having the same true treatment effect. This setup reflects a realistic source of between-trial heterogeneity.
+These shifts simulate trials enrolling progressively more severe populations, which report lower average outcomes across both treatment arms — despite having the same true treatment effect. This setup reflects a realistic source of between-trial heterogeneity.
+
 
 ```{r}
 #| message: false
 
 # Simulate 5 trials with 100 patients each (50 per arm)
 df <- simulate_trials(
-  baseline_means = c(20, 25, 25, 30, 35),     # Different mean baselines across trials
-  trial_intercepts = c(5, 0, 0, -10, -15),    # Outcome levels lowered in Trials 4 and 5
+  baseline_means = c(20, 25, 25, 30, 35),     
+  trial_intercepts = c(5, 0, 0, -10, -15),  
   cfb_active = rep(-9.6,5),
   cfb_control = rep(-7.8,5),
-  n_per_arm = 50,
-  beta_W = 0,     # no within-trial effect modification
-  beta_A = 0      # no across-trial effect modification
+  n_per_arm = 50
 )
 ```
 
@@ -211,6 +207,7 @@ df <- simulate_trials(
 summarize_baseline_by_trial(df)
 ```
 
+## Estimating the Pooled Treatment Effect
 
 @fig-naive-pooling-scenario2 visualizes the relationship between baseline severity and change from baseline within each treatment arm. The figure shows that:
 
@@ -231,7 +228,9 @@ mean_labels <- df %>%
     group_by(trta) %>%
     summarise(mean_change = mean(change, na.rm = TRUE)) %>%
     mutate(label = paste0("Mean change: ", round(mean_change, 1)))
-plot_change_by_treatment_with_means(df, title = "Change from Baseline by Treatment Group (Scenario 2)")
+plot_change_by_treatment_with_means(df, 
+                                    title = "Change from Baseline by Treatment Group (Scenario 2)",
+                                    subtitle = "Trials differ w.r.t. baseline severity")
 ```
 
 
@@ -310,6 +309,12 @@ ggplot() +
   )
 ```
 
+Given the data observed in @fig-naive-pooling-scenario2, we may think that there is effect modification by baseline severity, with the treatment effect appearing larger in patients with higher baseline severity. We can estimate this as follows:
+
+```{r}
+#| message: false
+fit_naive_hte <- glm(outcome ~ trta + baseline + trta*baseline, data = df)
+```
 
 
 ### Stratified Analysis by Trial
@@ -357,8 +362,6 @@ This substantial variation indicates that a naive pooling approach is no longer 
 
 The naive model estimated a treatment effect of `r sprintf("%.2f", est_naive)` (SE = `r sprintf("%.2f", se_naive)`), without accounting for trial heterogeneity. In contrast, the stratified model — which adjusts for between-trial differences — yields a more precise estimate of `r sprintf("%.2f", est_stratified)` (SE = `r sprintf("%.2f", se_stratified )`).
 
-
-💡 **Reflection** : Why might ignoring trial structure lead to misleading conclusions about treatment effects? In what types of studies is stratification especially important?
 
 ### Random trial effects
 
@@ -437,11 +440,191 @@ As shown in @tbl-fixed-vs-random-intercepts, the estimated trial intercepts diff
 
 This shrinkage reduces variability across trials and can lead to bias in the estimated intercepts -- particularly if true trial effects differ systematically. This is reflected in the standard deviations of the trial intercepts: `r sprintf("%.2f", sd_stratified)` for the stratified model versus `r sprintf("%.2f", sd_random)` under the random-effects model, confirming a modest degree of shrinkage. Although this reduction in variability appears small, even modest shrinkage can introduce bias in the treatment effect estimate -- especially when trial-level outcome differences are correlated with treatment assignment or patient characteristics. This risk is why, in pooled analyses and multi-trial synthesis, stratifying by trial using fixed effects is often preferred. Fixed-effect models estimate each trial’s intercept independently, thus preserving true baseline differences and avoiding bias introduced by shrinkage.
 
-# Investigating heterogeneity of treatment effect
+# Scenario 3: Pooling Trials with heterogeneous baseline risk and treatment effect
 
-GIven the data observed in @fig-naive-pooling-scenario2, we may think that there is effect modification by baseline severity, with the treatment effect appearing larger in patients with higher baseline severity. We can estiamte this as follows:
+In this third scenario, we consider a setting in which trials differ in baseline severity and average outcome levels, and where the treatment effect is modified by baseline severity.
+
+
+## Simulating Data
+
+In this scenario, we simulate five clinical trials that are identical in design and treatment effect. However, **Trials 4 and 5** differ systematically from Trials 1–3:
+
+- Trial 1 enrolls patients with the lowest baseline severity (mean = 20) and has a +5 intercept shift, indicating higher overall outcomes.
+- Trial 4 enrolls patients with moderately higher baseline severity (mean = 30) and includes a −10 intercept shift, lowering overall outcomes.
+- Trial 5 enrolls patients with the highest baseline severity (mean = 35) and includes a stronger −15 intercept shift to further reduce outcome levels.
+
+These shifts simulate trials that include more severely affected populations and report lower outcome scores across both treatment arms, despite having the same true treatment effect. This setup reflects a realistic source of between-trial heterogeneity.
 
 ```{r}
 #| message: false
-fit_naive_hte <- glm(outcome ~ trta + baseline + trta*baseline, data = df)
+
+df <- simulate_trials(
+  baseline_means = c(20, 25, 25, 30, 35),     
+  trial_intercepts = c(5, 0, 0, -10, -15),
+  cfb_active = rep(-9.6,5),
+  cfb_control = rep(-7.8,5),
+  n_per_arm = 50,
+  beta_W = c(0, -0.05, -0.1, -0.15, -0.2),  
+  beta_A = 0.1
+)
 ```
+
+
+```{r}
+#| message: false
+#| echo: false
+summarize_baseline_by_trial(df)
+```
+
+## Estimating the Pooled Treatment Effect
+
+@fig-naive-pooling-scenario3 visualizes the relationship between baseline severity and change from baseline within each treatment arm. The figure shows that:
+
+- Patients with higher baseline severity tend to show larger improvements (greater negative change).
+- The active treatment group shows a greater mean improvement than the control group.
+
+
+```{r}
+#| message: false
+#| echo: false
+#| fig-cap: "Observed Change from Baseline in Scenario 3."
+#| label: fig-naive-pooling-scenario3
+#| fig-width: 10
+#| fig-height: 8
+mean_labels <- df %>%
+    group_by(trta) %>%
+    summarise(mean_change = mean(change, na.rm = TRUE)) %>%
+    mutate(label = paste0("Mean change: ", round(mean_change, 1)))
+plot_change_by_treatment_with_means(df, title = "Change from Baseline by Treatment Group (Scenario 3)")
+```
+
+### Random treatment effects
+
+We investigate between-trial heterogeneity in treatment effects using a linear mixed model with random slopes for treatment and fixed intercepts by trial:
+
+```{r}
+#| message: false
+((fit_random_hte <- lmer(outcome ~ -1 + trial + baseline:trial + trt + (0 + trt | trial), data = df)))
+```
+
+
+In this formula:
+
+- `-1 + trial`: Fixed intercept per trial
+- `baseline + trt`: Fixed effect of baseline and treatment
+- `(0 + trt | trial)`: Random treatment effect per trial
+
+The fitted effects are visualized in @fig-model-fit-stratified-scenario3. We can derive an approximate 95\% confidence interval as follows:
+
+```{r}
+((ci_mu <- confint(fit_random_hte, method = "Wald")["trt", ]))
+``` 
+
+To derive an approximate 95% prediction interval for the treatment effect, we can use the following approach:
+
+```{r}
+# Extract mean treatment effect
+mu <- fixef(fit_random_hte)["trt"]
+tau2 <- as.numeric(VarCorr(fit_random_hte)$trial["trt", "trt"])
+var_mu <- vcov(fit_random_hte)["trt", "trt"]
+
+# Number of studies
+n_studies <- length(unique(df$trial))
+df_t <- n_studies - 2
+
+# t critical value for 95% PI
+t_crit <- qt(0.975, df = df_t)
+
+# 95% Prediction Interval
+pred_lower <- mu - t_crit * sqrt(tau2 + var_mu)
+pred_upper <- mu + t_crit * sqrt(tau2 + var_mu)
+
+cbind(pred_lower, pred_upper)
+```
+
+
+```{r}
+#| echo: false
+#| fig-cap: "Trial-Specific Estimates from the Random-Effects Model. Estimated intercepts terms (left) and treatment effects (right) for each trial are shown, based on a linear mixed-effects model with fixed intercepts by trial and random slopes for treatment. The black points and lines represent point estimates and 95% confidence intervals. The pooled treatment effect estimate is shown at the bottom, with dashed red lines indicating the 95% prediction interval for a new trial."
+#| label: fig-model-fit-stratified-scenario3
+#| fig-width: 8
+#| fig-height: 6
+coefs <- coef(fit_random_hte)$trial
+
+
+# Assume `coefs` is the result of coef(fit_random_hte)$trial
+coefs_df <- coefs %>%
+  tibble::rownames_to_column("trial")
+
+ci_fixed <- confint(fit_random_hte, level = 0.95, method = "Wald") %>%
+  as.data.frame() %>%
+  tibble::rownames_to_column("term") %>%
+  filter(grepl("^trialTrial_", term)) %>%
+  mutate(trial = gsub("trialTrial_", "Trial_", term)) %>%
+  rename(ci_lower = `2.5 %`, ci_upper = `97.5 %`) %>%
+  select(trial, ci_lower, ci_upper)
+
+# Extract intercepts (same for all rows → just take the first row)
+intercepts <- coefs_df[1, paste0("trialTrial_", 1:5)] %>%
+  pivot_longer(everything(), names_to = "trial_label", values_to = "estimate") %>%
+  mutate(
+    trial = gsub("trialTrial_", "Trial_", trial_label),
+    parameter = "intercept"
+  ) %>%
+  left_join(ci_fixed, by = "trial") %>%
+  select(trial, parameter, estimate, ci_lower, ci_upper)
+
+# Extract trial-specific treatment effects
+slopes <- coefs_df %>%
+  select(trial, trt) %>%
+  mutate(parameter = "treatment", estimate = trt) %>%
+  select(trial, parameter, estimate)
+
+# Combine for plotting
+plot_df <- bind_rows(intercepts, slopes)
+
+# Add summary
+plot_df <- plot_df %>% add_row(data.frame(trial="Pooled", parameter="treatment", 
+                                          estimate=mu, 
+                                          ci_lower=ci_mu[1], ci_upper=ci_mu[2]))
+
+# Plot forest with facets
+ggplot(plot_df, aes(x = estimate, y = trial)) +
+  geom_point() +
+  
+   # Prediction interval for "Pooled" only
+  geom_errorbarh(
+    data = data.frame(
+      trial = "Pooled",
+      parameter = "treatment",
+      estimate = mu,
+      pred_lower = pred_lower,
+      pred_upper = pred_upper
+    ),
+    aes(xmin = pred_lower, xmax = pred_upper),
+    height = 0.4,
+    color = "darkred",
+    linetype = "dashed"
+  ) +
+  
+  geom_errorbarh(aes(xmin = ci_lower, xmax = ci_upper), height = 0.2, na.rm = TRUE) +
+  
+  facet_wrap(~parameter, scales = "free_x") +
+  labs(
+    title = "Trial-specific Estimates from Random-Effects Model",
+    subtitle = "Dashed lines indicate 95% Prediction Interval for Pooled Treatment Effect",
+    x = "Estimate",
+    y = NULL
+  ) +
+  theme_minimal()
+
+```
+
+
+
+
+Let’s visualize the stratified model predictions to understand how trial-specific baselines affect the outcome estimates.
+
+
+
+## Investigating effect modification

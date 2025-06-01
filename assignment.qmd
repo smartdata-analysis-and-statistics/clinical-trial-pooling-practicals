@@ -1,0 +1,285 @@
+---
+title: "Assignment: Pooled Analysis of Clinical Trial Data"
+author: "Thomas Debray"
+date: today
+format: 
+  pdf:
+    number-sections: true
+    toc: true
+    toc-depth: 2
+---
+
+# Preparation to computer practical
+
+Open R and install the following packages (if not already installed):
+
+```{r}
+#| eval: false
+install.packages(c("dplyr", "ggplot2", "lme4"))
+
+library(dplyr)
+library(ggplot2)
+library(lme4)
+```
+
+Make sure the following R scripts are available in your working directory:
+
+`simulate_trials.R` ; available from: <https://github.com/smartdata-analysis-and-statistics/clinical-trial-pooling-practicals/> (or at the end of this document)
+
+Source the script using:
+
+```{r}
+#| eval: false
+source("simulate_trials.R")  
+```
+
+# Scenario 1
+
+Use the `simulate_trials()` function to generate five clinical trials with a continuous outcome (`outcome`), a baseline measurement (`baseline`), and two treatment arms (active and control).
+
+```{r}
+#| eval: FALSE
+df <- simulate_trials(
+  baseline_means = rep(25, 5),
+  trial_intercepts = rep(0, 5),
+  cfb_active = rep(-9.6, 5),
+  cfb_control = rep(-7.8, 5),
+  n_per_arm = 50,
+  seed = 2025
+)
+```
+
+## Explore Baseline Distributions
+
+Investigate the distribution of the `baseline` variable:
+
+- Are there significant differences in baseline values between the two treatment arms within each trial?
+- Does the baseline distribution vary between trials?
+
+## Visual Diagnostics
+
+Create a scatter plot showing individual `outcome` values as a function of `baseline`, separately for each trial.  An example is given by  [Torgersen et al. (2011)](https://www.tandfonline.com/doi/full/10.3109/00952990.2011.596980) (Figure 2). You can generate the plot as follows:
+
+```{r}
+#| eval: FALSE
+ggplot(df, aes(x = baseline, y = outcome, color = trta)) +
+  geom_point(alpha = 0.6) +
+  facet_wrap(~trial) +
+  labs(
+    title = "Observed Outcomes by Baseline Severity and Trial",
+    x = "Baseline Severity",
+    y = "Outcome"
+  ) +
+  theme_minimal()
+```
+
+Use the plot to guide your expectations before fitting a model:
+
+- Does the treatment effect appear to vary by trial?
+- Does the treatment effect appear to vary with baseline severity?
+- Based on the plot, would a naive pooled analysis (ignoring trial structure) seem appropriate?
+
+## Estimation of treatment effect 
+
+We now adopt a **naive pooling approach**, combining data from all trials and adjusting for baseline severity. The treatment effect (active vs. control) is estimated as follows:
+
+```{r}
+#| eval: FALSE
+glm(outcome ~ trta + baseline, data = df)
+```
+
+After fitting the model, consider the following questions:
+
+- What is the estimated treatment effect?
+- Is the estimated effect consistent with the visual patterns in the plot?
+- Do you think this model provides a valid summary of the treatment effect? Why or why not?
+
+Now fit a stratified model that allows each trial to have its own intercept:
+
+```{r}
+#| eval: FALSE
+glm(outcome ~ -1 + trial + trta + baseline, data = df)
+```
+
+This model accounts for differences in average outcome levels across trials, while still estimating a common treatment effect and adjusting for baseline severity.
+
+- What is the estimated treatment effect (`trtaActive`)?
+- Compare the trial-specific intercepts. Are they similar across trials, or is there meaningful variation?
+- Do the intercept estimates align with what you observed in the scatter plot?
+- Based on the model output, does the stratified approach seem more appropriate than the naive pooled analysis? Justify your answer.
+
+# Scenario 2
+
+Use the `simulate_trials()` function to generate five clinical trials with a continuous outcome, a baseline measurement, and two treatment arms. This time, we introduce systematic differences across trials:
+
+```{r}
+#| eval: FALSE
+df <- simulate_trials(
+  baseline_means = c(20, 25, 25, 30, 35),     
+  trial_intercepts = c(5, 0, 0, -10, -15),
+  cfb_active = rep(-9.6,5),
+  cfb_control = rep(-7.8,5),
+  n_per_arm = 50,
+  seed = 2025
+)
+```
+
+## Explore Baseline Distributions
+
+Investigate the distribution of the `baseline` variable:
+
+- Are there significant differences in baseline values between the two treatment arms within each trial?
+- Does the baseline distribution vary between trials?
+
+
+## Visual Diagnostics
+
+Create a scatter plot showing individual `outcome` values as a function of `baseline`, separately for each trial.  Use the plot to guide your expectations before fitting a model:
+
+- Does the treatment effect appear to vary by trial?
+- Does the treatment effect appear to vary with baseline severity?
+- Based on the plot, would a naive pooled analysis (ignoring trial structure) seem appropriate?
+
+## Estimation of treatment effect 
+
+- Estimate the treatment effect using naive pooling. 
+- Estimate the treatment effect using a stratified model.
+- Compare the results of the two models. How do they differ in terms of treatment effect estimates and trial intercepts?
+
+Instead of estimating a separate fixed intercept for each trial, we can model trial-specific intercepts as random effects. This approach assumes that the intercepts for each trial are not fixed but drawn from a common normal distribution.
+
+```{r}
+#| eval: FALSE
+lmer(outcome ~  trta + baseline + (1|trial), data = df)
+```
+
+- Extract the estimated effects using the function `coef()`
+- What is the estimated treatment effect?
+- What are the estimated trial-specific intercepts?
+- How do these intercepts compare to those from the stratified model? **Tip**: You may compare the standard deviation of the trial intercepts across models to assess how much variability is captured or shrunk in the random-effects approach.
+
+
+# Scenario 3
+
+Use the `simulate_trials()` function to generate five clinical trials with a continuous outcome, a baseline measurement, and two treatment arms. This time, we introduce heterogeneity in the treatment effect.
+
+```{r}
+#| eval: FALSE
+df <- simulate_trials(
+  baseline_means = c(20, 25, 25, 30, 35),     
+  trial_intercepts = c(5, 0, 0, -10, -15),
+  cfb_active = rep(-9.6,5),
+  cfb_control = rep(-7.8,5),
+  n_per_arm = 50,
+  beta_W = c(0, -0.05, -0.1, -0.15, -0.2),  
+  beta_A = 0.1,
+  seed = 2025
+)
+```
+
+## Visual Diagnostics
+
+Create a scatter plot showing individual `outcome` values as a function of `baseline`, separately for each trial.  Use the plot to guide your expectations before fitting a model:
+
+- Does the treatment effect appear to vary by trial?
+- Does the treatment effect appear to vary with baseline severity?
+- Based on the plot, would a naive pooled analysis (ignoring trial structure) seem appropriate?
+
+
+## Estimation of treatment effect 
+
+In this scenario, we investigate the presence of heterogeneous treatment effects using a linear mixed model with random slopes for treatment and fixed intercepts by trial:
+
+```{r}
+#| eval: false
+lmer(outcome ~ -1 + trial +  baseline:trial + trt + (0 + trt | trial), data = df)
+```
+
+In this formula:
+
+- `-1 + trial`: Fixed intercept per trial
+- `baseline:trial` Fixed effect for baseline severity per trial
+- `trt`: Pooled treatment effect
+- `(0 + trt | trial)`: Random treatment effect per trial
+
+We can extract key parameters as follows:
+
+```{r}
+#| eval: false
+# Pooled treatment effect
+fixef(fit)["trt"]
+
+# Standard error of the treatment effect
+sqrt(vcov(fit)["trt", "trt"])
+
+# Between-study variance of the treatment effect
+VarCorr(fit)$trial["trt", "trt"]
+```
+
+Use the estimates above to derive an approximate 95\% confidence interval and 95\% prediction interval for the treatment effect.
+
+Based on the model output:
+
+- What is the estimated between-trial variance of the treatment effect (τ²)?
+- How does the 95\% prediction interval compare to the confidence interval of the pooled treatment effect?
+- Do the trial-specific treatment effects (from the plot or model output) vary meaningfully across trials?
+- What might this imply about the assumption of a common treatment effect?
+
+Optional: Plot the trial-specific treatment effects and overlay the pooled estimate with its prediction interval.
+
+## Modeling treatment-effect modification
+
+We suspect that the heterogeneity in treatment effect may be explained by differences in baseline severity across patients. To explore this, we include a common interaction effect between treatment and baseline in the model:
+
+```{r}
+#| eval: FALSE
+lmer(outcome ~ -1 + trial + baseline:trial + trt + trt:baseline + (0 + trt | trial) , data = df)
+```
+
+- Which parameter quantifies the pooled interaction effect? What does the sign and magnitude of this interaction coefficient tell you?
+- How should we interpret this interaction term in the context of treatment effect modification by baseline severity?
+- Is the model appropriate?
+- How can we evaluate whether there is evidence of residual heterogeneity in treatment effect?
+
+We now fit a regression model that explicitly separates within- from across-trial interaction:
+
+```{r}
+#| eval: FALSE
+lmer(outcome ~ -1 + trial + baseline:trial + trt:trial +  trt:baseline + (0 + trt:baseline | trial) , data = df)
+```
+
+In this formula:
+
+- `-1 + trial`: Fixed intercept per trial
+- `baseline:trial`: Fixed effect for baseline severity per trial
+- `trt:trial` : Fixed treatment effect per trial
+- `baseline:trt`: Pooled within-study interaction between baseline and treatment
+- `(0 + trt:baseline | trial)`: Random interaction effect per trial
+
+Alternatively, we can fit:
+
+```{r}
+#| eval: FALSE
+glm(outcome ~ -1 + trial + baseline:trial + trt:trial + xk_mean:trt + cbase:trt , data = df)
+```
+
+In this formula:
+
+- `xk_mean:trt`: Common effect for study-level confounding
+- `cbase:trt`: Common within-study interaction between baseline and treatment
+
+
+
+# Concluding remarks
+
+The solutions to the practical are available from <https://smartdata-analysis-and-statistics.github.io/clinical-trial-pooling-practicals/>
+
+# APPENDIX
+
+The contents of `simulate_trials.R` are as follows:
+```{r}
+#| eval: TRUE
+#| echo: FALSE
+# Show contents of the script
+cat(readLines("R/simulate_trials.R"), sep = "\n")
+```
