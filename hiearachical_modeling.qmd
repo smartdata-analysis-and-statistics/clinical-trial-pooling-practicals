@@ -498,23 +498,32 @@ mean_labels <- df %>%
 plot_change_by_treatment_with_means(df, title = "Change from Baseline by Treatment Group (Scenario 3)")
 ```
 
-### Random treatment effects
+### Assessing Between-Trial Heterogeneity in Treatment Effects
 
 We investigate between-trial heterogeneity in treatment effects using a linear mixed model with random slopes for treatment and fixed intercepts by trial:
 
 ```{r}
 #| message: false
-((fit_random_hte <- lmer(outcome ~ -1 + trial + baseline:trial + trt + (0 + trt | trial), data = df)))
+fit_random_hte <- lmer(outcome ~ -1 + trial + baseline:trial + 
+                         trt + (0 + trt | trial), data = df)
 ```
-
 
 In this formula:
 
-- `-1 + trial`: Fixed intercept per trial
-- `baseline + trt`: Fixed effect of baseline and treatment
-- `(0 + trt | trial)`: Random treatment effect per trial
+- `-1 + trial`: Includes a fixed intercept for each trial
+- `baseline:trial`: Allows each trial to have its own slope for baseline (trial-specific baseline effect)
+- `trt`: Estimates the average treatment effect across trials
+- `(0 + trt | trial)`: Allows the treatment effect to vary randomly by trial
 
-The fitted effects are visualized in @fig-model-fit-stratified-scenario3. We can derive an approximate 95\% confidence interval as follows:
+**Note**: The `trt` variable is modeled as a numeric binary indicator (0 = control, 1 = active treatment), rather than as a categorical factor. This allows us to directly interpret the fixed effect of `trt` as the **average treatment effect**. Additionally, modeling `trt` as numeric is necessary to estimate a random slope for `trt` per trial via `(0 + trt | trial)`. This would not be valid if `trt` were treated as a factor (e.g., using `trta`).
+
+The results are as follows:
+```{r}
+#| echo: false
+fit_random_hte 
+```
+
+We compute the 95\% confidence interval for the average treatment effect and a prediction interval that reflects heterogeneity across trials. The prediction interval estimates the range where a future trial's treatment effect might fall.
 
 ```{r}
 ((ci_mu <- confint(fit_random_hte, method = "Wald")["trt", ]))
@@ -525,7 +534,7 @@ To derive an approximate 95% prediction interval for the treatment effect, we ca
 ```{r}
 # Extract mean treatment effect
 mu <- fixef(fit_random_hte)["trt"]
-tau2 <- as.numeric(VarCorr(fit_random_hte)$trial["trt", "trt"])
+tau2 <- VarCorr(fit_random_hte)$trial["trt", "trt"]
 var_mu <- vcov(fit_random_hte)["trt", "trt"]
 
 # Number of studies
@@ -542,6 +551,9 @@ pred_upper <- mu + t_crit * sqrt(tau2 + var_mu)
 cbind(pred_lower, pred_upper)
 ```
 
+The prediction interval is wide, suggesting meaningful heterogeneity in treatment effects across trials. This implies that in some future settings, the treatment could be less effective compared to the pooled estimate.
+
+The fitted effects and prediction interval are visualized in @fig-model-fit-stratified-scenario3.
 
 ```{r}
 #| echo: false
@@ -586,7 +598,11 @@ plot_df <- bind_rows(intercepts, slopes)
 # Add summary
 plot_df <- plot_df %>% add_row(data.frame(trial="Pooled", parameter="treatment", 
                                           estimate=mu, 
-                                          ci_lower=ci_mu[1], ci_upper=ci_mu[2]))
+                                          ci_lower=ci_mu[1], ci_upper=ci_mu[2])) %>%
+  mutate(parameter = case_when(
+  parameter == "treatment" ~ "Treatment Effect",
+  parameter == "intercept" ~ "Intercept"
+))
 
 # Plot forest with facets
 ggplot(plot_df, aes(x = estimate, y = trial)) +
@@ -596,7 +612,7 @@ ggplot(plot_df, aes(x = estimate, y = trial)) +
   geom_errorbarh(
     data = data.frame(
       trial = "Pooled",
-      parameter = "treatment",
+      parameter = "Treatment Effect",
       estimate = mu,
       pred_lower = pred_lower,
       pred_upper = pred_upper
@@ -611,8 +627,8 @@ ggplot(plot_df, aes(x = estimate, y = trial)) +
   
   facet_wrap(~parameter, scales = "free_x") +
   labs(
-    title = "Trial-specific Estimates from Random-Effects Model",
-    subtitle = "Dashed lines indicate 95% Prediction Interval for Pooled Treatment Effect",
+    title = "Trial-Specific Intercepts and Treatment Effects",
+    subtitle = "Red dashed line: 95% prediction interval for pooled treatment effect",
     x = "Estimate",
     y = NULL
   ) +
