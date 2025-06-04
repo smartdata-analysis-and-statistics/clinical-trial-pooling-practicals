@@ -9,29 +9,52 @@ format:
     toc-depth: 2
 ---
 
-# Preparation to computer practical
+# Preparation for the Computer Practical
 
-Open R and install the following packages (if not already installed):
+Before the session, please complete the following setup steps on your computer:
 
+## Install R and RStudio
+- Download and install R from: <https://cran.r-project.org/>
+- Download and install RStudio (Desktop version) from: <https://posit.co/download/rstudio-desktop/>
+
+## Install Required R Packages
+
+Open RStudio and run the following code to install the necessary packages (skip any that are already installed):
 ```{r}
 #| eval: false
 install.packages(c("dplyr", "ggplot2", "lme4"))
+```
 
+## Download Supporting Scripts
+
+Ensure the following R script is saved in your working directory (i.e., the folder you will use during the practical):
+
+- `simulate_trials.R` You can download it from <https://github.com/smartdata-analysis-and-statistics/clinical-trial-pooling-practicals/> (or find it attached at the end of this document)
+
+
+# Starting the Practical
+
+Open RStudio
+
+Load the required packages by running:
+
+```{r}
+#| eval: false
 library(dplyr)
 library(ggplot2)
 library(lme4)
 ```
 
-Make sure the following R scripts are available in your working directory:
-
-`simulate_trials.R` ; available from: <https://github.com/smartdata-analysis-and-statistics/clinical-trial-pooling-practicals/> (or at the end of this document)
-
-Source the script using:
+Source the simulation script to generate the dataset:
 
 ```{r}
 #| eval: false
 source("simulate_trials.R")  
 ```
+
+This script will simulate patient-level data from multiple clinical trials. The resulting dataset will be used throughout the practical for modeling and analysis.
+
+You're now ready to begin the exercises.
 
 # Scenario 1
 
@@ -192,7 +215,8 @@ In this scenario, we investigate the presence of heterogeneous treatment effects
 
 ```{r}
 #| eval: false
-lmer(outcome ~ -1 + trial +  baseline:trial + trt + (0 + trt | trial), data = df)
+lmer(outcome ~ -1 + trial +  baseline:trial + trt + 
+       (0 + trt | trial), data = df)
 ```
 
 In this formula:
@@ -233,19 +257,22 @@ We suspect that the heterogeneity in treatment effect may be explained by differ
 
 ```{r}
 #| eval: FALSE
-lmer(outcome ~ -1 + trial + baseline:trial + trt + trt:baseline + (0 + trt | trial) , data = df)
+lmer(outcome ~ -1 + trial + baseline:trial + trt + 
+       trt:baseline + (0 + trt | trial) , data = df)
 ```
 
-- Which parameter quantifies the pooled interaction effect? What does the sign and magnitude of this interaction coefficient tell you?
-- How should we interpret this interaction term in the context of treatment effect modification by baseline severity?
-- Is the model appropriate?
-- How can we evaluate whether there is evidence of residual heterogeneity in treatment effect?
+- Which parameter in the model quantifies the pooled interaction effect? 
+- What does the *sign* and *magnitude* of the interaction coefficient (`trt:baseline`) tell you?
+- How should we interpret this interaction term in the context of treatment-effect modification?
+- Is the model appropriate for separating within- and across-study interaction effects?
+- How can we evaluate whether residual heterogeneity in treatment effect remains, despite modeling the interaction?
 
 We now fit a regression model that explicitly separates within- from across-trial interaction:
 
 ```{r}
 #| eval: FALSE
-lmer(outcome ~ -1 + trial + baseline:trial + trt:trial +  trt:baseline + (0 + trt:baseline | trial) , data = df)
+lmer(outcome ~ -1 + trial + baseline:trial + trt:trial + 
+       trt:baseline + (0 + trt:baseline | trial) , data = df)
 ```
 
 In this formula:
@@ -254,9 +281,15 @@ In this formula:
 - `baseline:trial`: Fixed effect for baseline severity per trial
 - `trt:trial` : Fixed treatment effect per trial
 - `baseline:trt`: Pooled within-study interaction between baseline and treatment
-- `(0 + trt:baseline | trial)`: Random interaction effect per trial
+- `(0 + trt:baseline | trial)`: Trial-specific deviations from the pooled interaction
 
-Alternatively, we can fit:
+**Questions for Discussion**
+
+- How does this model help distinguish within- from across-trial interactions?
+- What does the variance component for the random slope `(0 + trt:baseline | trial)` represent?
+- How can we use this model to examine inconsistency or effect modification across trials?
+
+Finally, we consider an extended model that also adjusts for trial-level confounding using study-level means:
 
 ```{r}
 #| eval: FALSE
@@ -274,6 +307,13 @@ In this formula:
 - ` (0 + trt | trial)`: Random treatment effects
 - `(0 + trt:cbase | trial)`: Random interaction effects
 
+
+**Questions for Discussion**
+
+- What role does `xk_mean:trt` play in this model? How does it address ecological bias?
+- Under what conditions might the inclusion of study-level means improve model validity?
+- How do you interpret the presence of both fixed and random interaction terms in this model?
+- Would you expect this model to reduce between-trial heterogeneity in treatment effects? Why or why not?
 
 
 # Concluding remarks
