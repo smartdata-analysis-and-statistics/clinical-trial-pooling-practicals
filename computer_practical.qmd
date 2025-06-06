@@ -10,9 +10,9 @@ format:
     toc-depth: 2
 ---
 
-# Preparation (do this before you attend the course)
+# Preparation
 
-Before the session, please complete the following setup steps on your computer:
+Please complete the following setup steps on your computer:
 
 ## Install R and RStudio
 - Download and install R from: <https://cran.r-project.org/>
@@ -29,8 +29,6 @@ install.packages(c("dplyr", "ggplot2", "lme4"))
 ## Download Supporting Scripts
 
 Ensure the following R script is saved in your working directory (i.e., the folder you will use during the practical):
-
-- `simulate_trials.R` You can download it from <https://github.com/smartdata-analysis-and-statistics/clinical-trial-pooling-practicals/> (or find it below)
 
 <details>
 <summary><strong>Show contents of simulate_trials.R</strong></summary>
@@ -323,10 +321,5 @@ In this formula:
 - Under what conditions might the inclusion of study-level means improve model validity?
 - How do you interpret the presence of both fixed and random interaction terms in this model?
 - Would you expect this model to reduce between-trial heterogeneity in treatment effects? Why or why not?
-
-
-# Concluding remarks
-
-The solutions to the practical are available from <https://smartdata-analysis-and-statistics.github.io/clinical-trial-pooling-practicals/>
 
 
