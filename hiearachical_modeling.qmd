@@ -504,7 +504,7 @@ mean_labels <- df %>%
 plot_change_by_treatment_with_means(df, title = "Change from Baseline by Treatment Group (Scenario 3)")
 ```
 
-### Assessing Between-Trial Heterogeneity in Treatment Effects
+## Assessing Between-Trial Heterogeneity in Treatment Effects {#sec-stratifiedREmodel}
 
 We investigate between-trial heterogeneity in treatment effects using a linear mixed model with random slopes for treatment and fixed intercepts by trial:
 
@@ -570,11 +570,67 @@ The fitted effects and prediction interval are visualized in @fig-model-fit-stra
 plot_mixed_model_effects(fit_random_hte)
 ```
 
-
-
-
-Let’s visualize the stratified model predictions to understand how trial-specific baselines affect the outcome estimates.
-
-
-
 ## Investigating effect modification
+
+We now explore whether the observed treatment effect heterogeneity can be explained by effect modification, using interaction terms between treatment and baseline severity.
+
+### Common interaction effect
+
+A simple extension of our linear mixed model defined in @sec-stratifiedREmodel -- with fixed intercepts per trial and random slopes for treatment -- is to include a **common treatment-by-baseline interaction** term. This allows us to assess whether baseline severity modifies the treatment effect, assuming the interaction is constant across trials.
+
+```{r}
+#| message: false
+fit_hte_1 <- lmer(outcome ~ -1 + trial + baseline:trial + trt + 
+                    trt:baseline + (0 + trt | trial) , data = df)
+```
+
+In this formula:
+
+- `-1 + trial`: Fixed intercept per trial
+- `baseline:trial`: Fixed effect for baseline severity per trial
+- `trt`: Estimates the average treatment effect across trials
+- `trt:baseline`: Interaction between baseline and treatment
+- `(0 + trt | trial)`: Allows the treatment effect to vary randomly by trial
+
+The results are as follows:
+```{r}
+#| echo: false
+fit_hte_1 
+```
+
+We can now visualize the treatment effect as a function of the baseline coviarate:
+
+```{r}
+#| echo: false
+#| fig-width: 8
+#| fig-height: 5
+# Extract fixed effects
+beta_trt <- fixef(fit_hte_1)["trt"]
+beta_trt_baseline <- fixef(fit_hte_1)["baseline:trt"]
+
+# Create baseline range
+baseline_vals <- seq(min(df$baseline), max(df$baseline), length.out = 100)
+
+# Calculate marginal treatment effect at each baseline value
+treatment_effect <- beta_trt + beta_trt_baseline * baseline_vals
+
+# Create data frame for plotting
+te_df <- data.frame(
+  baseline = baseline_vals,
+  treatment_effect = treatment_effect
+)
+
+# Plot the treatment effect function
+ggplot(te_df, aes(x = baseline, y = treatment_effect)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  geom_line(linewidth = 1.2) +
+  geom_rug(data = df, aes(x = baseline), inherit.aes = FALSE, sides = "b", alpha = 0.3) +
+  labs(
+    title = "Estimated Treatment Effect by Baseline Severity",
+    x = "Baseline",
+    y = "Treatment Effect (Active vs Control)"
+  ) +
+  theme_minimal()
+```
+
+
