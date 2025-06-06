@@ -1,6 +1,12 @@
 ---
 title: "Hierarchical Modeling"
-format: html
+author: "Thomas Debray"
+date: today
+format: 
+  html:
+    number-sections: true
+    toc: true
+    toc-depth: 2
 ---
 
 # Scenario 1: Pooling Homogeneous Trials

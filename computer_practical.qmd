@@ -1,15 +1,16 @@
 ---
-title: "Assignment: Pooled Analysis of Clinical Trial Data"
+title: "Computer Practical"
+subtitle: "Pooled Analysis of Clinical Trial Data"
 author: "Thomas Debray"
 date: today
 format: 
-  pdf:
+  html:
     number-sections: true
     toc: true
     toc-depth: 2
 ---
 
-# Preparation for the Computer Practical
+# Preparation (do this before you attend the course)
 
 Before the session, please complete the following setup steps on your computer:
 
@@ -29,8 +30,16 @@ install.packages(c("dplyr", "ggplot2", "lme4"))
 
 Ensure the following R script is saved in your working directory (i.e., the folder you will use during the practical):
 
-- `simulate_trials.R` You can download it from <https://github.com/smartdata-analysis-and-statistics/clinical-trial-pooling-practicals/> (or find it attached at the end of this document)
+- `simulate_trials.R` You can download it from <https://github.com/smartdata-analysis-and-statistics/clinical-trial-pooling-practicals/> (or find it below)
 
+<details>
+<summary><strong>Show contents of simulate_trials.R</strong></summary>
+```{r}
+#| eval: TRUE
+#| echo: FALSE
+cat(readLines("R/simulate_trials.R"), sep = "\n")
+```
+</details>
 
 # Starting the Practical
 
@@ -320,12 +329,4 @@ In this formula:
 
 The solutions to the practical are available from <https://smartdata-analysis-and-statistics.github.io/clinical-trial-pooling-practicals/>
 
-# APPENDIX
 
-The contents of `simulate_trials.R` are as follows:
-```{r}
-#| eval: TRUE
-#| echo: FALSE
-# Show contents of the script
-cat(readLines("R/simulate_trials.R"), sep = "\n")
-```
