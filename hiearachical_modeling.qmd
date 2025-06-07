@@ -574,14 +574,14 @@ plot_mixed_model_effects(fit_random_hte)
 
 We now explore whether the observed treatment effect heterogeneity can be explained by effect modification, using interaction terms between treatment and baseline severity.
 
-### Common interaction effect
+### Common interaction effect {#sec-commonInteraction}
 
 A simple extension of our linear mixed model defined in @sec-stratifiedREmodel -- with fixed intercepts per trial and random slopes for treatment -- is to include a **common treatment-by-baseline interaction** term. This allows us to assess whether baseline severity modifies the treatment effect, assuming the interaction is constant across trials.
 
 ```{r}
 #| message: false
 fit_hte_1 <- lmer(outcome ~ -1 + trial + baseline:trial + trt + 
-                    trt:baseline + (0 + trt | trial) , data = df)
+                    baseline:trt + (0 + trt | trial) , data = df)
 ```
 
 In this formula:
@@ -589,21 +589,56 @@ In this formula:
 - `-1 + trial`: Fixed intercept per trial
 - `baseline:trial`: Fixed effect for baseline severity per trial
 - `trt`: Estimates the average treatment effect across trials
-- `trt:baseline`: Interaction between baseline and treatment
+- `baseline:trt`: Interaction between baseline severity and treatment
 - `(0 + trt | trial)`: Allows the treatment effect to vary randomly by trial
 
 The results are as follows:
 ```{r}
 #| echo: false
+# Extract SD of random slope for trt within trial
+tau_fit_hte_1 <- as.data.frame(VarCorr(fit_hte_1)) %>%
+  dplyr::filter(grp == "trial", var1 == "trt", is.na(var2)) %>%
+  dplyr::pull(sdcor)
+
 fit_hte_1 
 ```
 
-We can now visualize the treatment effect as a function of the baseline coviarate:
+The coefficients `trt` and `baseline:trt` define a linear relationship between baseline severity and the estimated treatment effect (Active vs Control). In @fig-hte-commoninteraction, we visualize this relationship using the model's fixed effects, with a dashed line indicating no treatment effect.
+
 
 ```{r}
 #| echo: false
+#| message: false
+#| fig-cap: "Estimated treatment effect (active vs control) as a function of baseline severity. The red dashed line at 0 indicates no treatment benefit. Negative values suggest a favorable effect of the active treatment, while positive values suggest harm. The distribution of baseline values across the included trials is shown as rug marks along the x-axis. Colored dots represent the expected (marginal) treatment effect within each trial, calculated by averaging predicted outcomes across that trial's observed baseline distribution."
+#| label: fig-hte-commoninteraction
 #| fig-width: 8
 #| fig-height: 5
+
+library(emmeans)
+
+baseline_means <- df %>%
+  group_by(trial) %>%
+  summarise(mean_baseline = mean(baseline), .groups = "drop")
+
+
+# Create a grid of all observed combinations of baseline, trial, and trt
+grid_df <- df %>%
+  dplyr::select(trial, baseline) %>%
+  tidyr::expand_grid(trt = c(0, 1))
+
+# Predict outcome under each treatment
+grid_df$pred <- predict(fit_hte_1, newdata = grid_df, re.form = NA)  # marginalize over random effects
+
+# Calculate average predicted outcome per trial and trt
+avg_outcome <- grid_df %>%
+  group_by(trial, trt) %>%
+  summarise(mean_pred = mean(pred), .groups = "drop") %>%
+  tidyr::pivot_wider(names_from = trt, values_from = mean_pred, names_prefix = "trt_") %>%
+  mutate(treatment_effect = trt_1 - trt_0)
+
+avg_outcome_annotated <- avg_outcome %>%
+  left_join(baseline_means, by = "trial")
+
 # Extract fixed effects
 beta_trt <- fixef(fit_hte_1)["trt"]
 beta_trt_baseline <- fixef(fit_hte_1)["baseline:trt"]
@@ -624,13 +659,227 @@ te_df <- data.frame(
 ggplot(te_df, aes(x = baseline, y = treatment_effect)) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
   geom_line(linewidth = 1.2) +
+  coord_cartesian(xlim = range(df$baseline)) +
   geom_rug(data = df, aes(x = baseline), inherit.aes = FALSE, sides = "b", alpha = 0.3) +
+  # Add per-trial average treatment effects
+  geom_point(data = avg_outcome_annotated,
+             aes(x = mean_baseline, y = treatment_effect, color = trial),
+             size = 3,
+             alpha = 0.9) +
   labs(
-    title = "Estimated Treatment Effect by Baseline Severity",
-    x = "Baseline",
+    x = "Baseline Severity",
     y = "Treatment Effect (Active vs Control)"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_blank()
+  )
 ```
 
+Although the model includes a treatment-by-baseline interaction (`baseline:trt`), there remains evidence of heterogeneity in treatment effect across trials. This is indicated by the random slope variance for treatment (`trt | trial`), with an estimated standard deviation of `r sprintf("%.2f", tau_fit_hte_1)`. 
 
+### Random within-study interaction effects
+
+In this approach, we stratify all parameters **except** for the treatment-by-covariate interaction term by trial. This includes the parameter representing the treatment effect at the covariate's reference value. All "nuisance" parameters (i.e., parameters not of primary interest) are allowed to vary across trials. A random effect is included only on the within-trial interaction term (`baseline:trt`), capturing heterogeneity in effect modification across trials.
+
+```{r}
+#| message: FALSE
+#| warning: FALSE
+fit_hte_2 <- lmer(outcome ~ -1 + trial + baseline:trial + trt:trial + 
+                    baseline:trt + (0 + baseline:trt | trial) , data = df)
+```
+
+This stratification of all nuisance parameters -- including the treatment effect at the covariate's reference value — ensures that the estimate of `baseline:trt` (the treatment–covariate interaction) is informed purely by within-trial comparisons.
+
+The fitted model is:
+```{r}
+#| echo: false
+fit_hte_2 
+```
+
+Since the between-trial variance in the interaction effects is close to zero, we may simplify the model by removing the random component and estimating a common interaction term across trials:
+
+```{r}
+#| message: FALSE
+#| warning: FALSE
+fit_hte_2b <- glm(outcome ~ -1 + trial + baseline:trial + trt:trial + 
+                    baseline:trt, data = df)
+```
+
+The coefficients `trt:trial` and `baseline:trt` define a linear relationship between baseline severity and the estimated treatment effect (active vs control), with a trial-specific intercept and a common interaction slope. In @fig-hte-rwi, we visualize this relationship using both model-predicted curves and trial-level marginal estimates.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: "Estimated treatment effect (active vs control) as a function of baseline severity for each trial. The red dashed line at 0 indicates no treatment benefit. Negative values suggest a favorable effect of the active treatment, while positive values suggest harm. Rug marks show the distribution of baseline values. Coloured lines and dots represent, respectively, the model-based treatment-effect curves and the marginal (average) treatment effect within each trial."
+#| label: fig-hte-rwi
+#| fig-width: 8
+#| fig-height: 5
+
+
+# ----- 1. Trial-level intercepts and common slope -----------------------------
+trials          <- unique(df$trial)
+
+# Use coef() for glm model
+beta_slope <- coef(fit_hte_2b)["baseline:trt"]
+beta_intercepts <- sapply(trials, function(t) coef(fit_hte_2b)[paste0("trial", t, ":trt")])
+
+# Create treatment effect curves
+baseline_vals <- seq(min(df$baseline), max(df$baseline), length.out = 100)
+te_df <- expand.grid(baseline = baseline_vals, trial = trials) %>%
+  mutate(treatment_effect = beta_intercepts[trial] + beta_slope * baseline)
+
+# Compute marginal treatment effect per trial
+grid_df <- df %>%
+  select(trial, baseline) %>%
+  expand_grid(trt = c(0, 1))
+
+grid_df$pred <- predict(fit_hte_2b, newdata = grid_df)
+
+avg_outcome <- grid_df %>%
+  group_by(trial, trt) %>%
+  summarise(mean_pred = mean(pred), .groups = "drop") %>%
+  pivot_wider(names_from = trt, values_from = mean_pred, names_prefix = "trt_") %>%
+  mutate(treatment_effect = trt_1 - trt_0)
+
+# Compute mean baseline per trial
+baseline_means <- df %>%
+  group_by(trial) %>%
+  summarise(mean_baseline = mean(baseline), .groups = "drop")
+
+# Annotate trial-level outcomes
+avg_outcome_annotated <- left_join(avg_outcome, baseline_means, by = "trial")
+
+# Plot
+ggplot(te_df, aes(x = baseline, y = treatment_effect, color = trial)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  geom_line(linewidth = 1.2) +
+  geom_point(data = avg_outcome_annotated,
+             aes(x = mean_baseline, y = treatment_effect, color = trial),
+             size = 3, alpha = 0.7) +
+  geom_rug(data = df, aes(x = baseline), inherit.aes = FALSE, sides = "b", alpha = 0.3) +
+  coord_cartesian(xlim = range(df$baseline)) +
+  labs(
+    x = "Baseline Severity",
+    y = "Treatment Effect (Active vs Control)"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_blank()
+  )
+```
+
+### Distentangling within- and across-study interaction
+
+In this approach, we decompose the covariate `baseline` into two components: a within-trial centered value (`cbase`) and a trial-level mean (`xk_mean`). Specifically, we define `cbase = baseline - xk_mean` and include both `trt:cbase` and `xk_mean:trt` in the model. The coefficient for `trt:cbase` captures the within-trial treatment–covariate interaction, while the coefficient for `xk_mean:trt` represents the between-trial effect of the trial-level covariate mean on treatment effect.
+
+By explicitly modeling both components, this formulation separates within- and between-trial sources of interaction. As a result, the estimate of the within-trial interaction is not biased by between-trial heterogeneity in the covariate distribution (as is the case in @sec-commonInteraction). This is especially important in avoiding aggregation bias when interpreting effect modification.
+
+```{r}
+#| message: FALSE
+#| warning: FALSE
+fit_hte_3 <- lmer(outcome ~ -1 + trial + trt + trial:baseline + 
+                    trt:cbase + xk_mean:trt +
+                    (0 + trt | trial) + (0 + trt:cbase | trial),
+                  data = df)
+```
+
+The fitted model is:
+```{r}
+#| echo: false
+fit_hte_3 
+```
+
+Since the between-trial variance in the treatment effects and interaction effects is close to zero, we may simplify the model by removing the random components:
+
+```{r}
+#| message: FALSE
+#| warning: FALSE
+fit_hte_3b <- glm(outcome ~ -1 + trial + trt + trial:baseline + 
+                    trt:cbase + trt:xk_mean, data = df)
+```
+
+The model includes two interaction terms: `cbase:trt`, which captures the within-trial interaction between the centered covariate and treatment; and `xk_mean:trt`, which captures the across-trial interaction effect due to variation in trial-level covariate means. Together, these coefficients define a linear relationship between baseline severity and the estimated treatment effect (active vs control), while distinguishing within- and between-trial sources of effect modification. In @fig-hte-centering, we visualize this relationship using both model-predicted curves and trial-level marginal treatment effect estimates.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: "Estimated treatment effect (active vs control) as a function of baseline severity for each trial. The red dashed line at 0 indicates no treatment benefit. Negative values suggest a favorable effect of the active treatment, while positive values suggest harm. Rug marks show the distribution of baseline values. Coloured lines and dots represent, respectively, the model-based treatment-effect curves and the marginal (average) treatment effect within each trial."
+#| label: fig-hte-centering
+#| fig-width: 8
+#| fig-height: 5
+
+# Extract trial-level covariate means (xk_mean assumed present in df)
+trial_means <- df %>% distinct(trial, xk_mean)
+
+# Compute slope and intercepts from model
+beta_within <- coef(fit_hte_3b)["trt:cbase"]
+beta_across <- coef(fit_hte_3b)["trt:xk_mean"]
+beta_main <- coef(fit_hte_3b)["trt"]
+
+# Trial-specific intercept = main trt effect + xk_mean[i] * beta_across
+beta_intercepts <- trial_means %>%
+  mutate(treatment_intercept = beta_main + xk_mean * beta_across)
+
+# Treatment effect curves: trial-specific intercept + common within-trial slope
+baseline_vals <- seq(min(df$baseline), max(df$baseline), length.out = 100)
+
+# Build data for treatment effect curves
+te_df <- expand.grid(
+  baseline = baseline_vals,
+  trial = unique(df$trial)
+) %>%
+  left_join(trial_means, by = "trial") %>%
+  mutate(
+    cbase = baseline - xk_mean,
+    treatment_intercept = beta_main + xk_mean * beta_across,
+    treatment_effect = treatment_intercept + beta_within * cbase
+  ) %>%
+  drop_na(treatment_effect)
+
+
+# Compute marginal treatment effect per trial
+grid_df <- df %>%
+  select(trial, baseline, xk_mean) %>%
+  expand_grid(trt = c(0, 1)) %>%
+  mutate(cbase = baseline - xk_mean)
+
+grid_df$pred <- predict(fit_hte_3b, newdata = grid_df)
+
+avg_outcome <- grid_df %>%
+  group_by(trial, trt) %>%
+  summarise(mean_pred = mean(pred), .groups = "drop") %>%
+  pivot_wider(names_from = trt, values_from = mean_pred, names_prefix = "trt_") %>%
+  mutate(treatment_effect = trt_1 - trt_0)
+
+# Mean baseline per trial
+baseline_means <- df %>%
+  group_by(trial) %>%
+  summarise(mean_baseline = mean(baseline), .groups = "drop")
+
+avg_outcome_annotated <- left_join(avg_outcome, baseline_means, by = "trial")
+
+# Plot
+ggplot(te_df, aes(x = baseline, y = treatment_effect, color = trial)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  geom_line(linewidth = 1.2) +
+  geom_point(data = avg_outcome_annotated,
+             aes(x = mean_baseline, y = treatment_effect, color = trial),
+             size = 3, alpha = 0.7) +
+  geom_rug(data = df, aes(x = baseline), inherit.aes = FALSE, sides = "b", alpha = 0.3) +
+  coord_cartesian(xlim = range(df$baseline)) +
+  labs(
+    x = "Baseline Severity",
+    y = "Treatment Effect (Active vs Control)"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_blank()
+  )
+
+```
