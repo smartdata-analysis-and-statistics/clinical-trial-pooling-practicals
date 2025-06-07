@@ -13,4 +13,5 @@ Imports:
     quarto,
     tidyverse,
     kableExtra,
-    lme4
+    lme4,
+    emmeans
