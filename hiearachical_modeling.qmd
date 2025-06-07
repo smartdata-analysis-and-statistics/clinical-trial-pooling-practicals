@@ -808,10 +808,28 @@ The model includes two interaction terms: `cbase:trt`, which captures the within
 #| echo: false
 #| message: false
 #| warning: false
-#| fig-cap: "Estimated treatment effect (active vs control) as a function of baseline severity for each trial. The red dashed line at 0 indicates no treatment benefit. Negative values suggest a favorable effect of the active treatment, while positive values suggest harm. Rug marks show the distribution of baseline values. Coloured lines and dots represent, respectively, the model-based treatment-effect curves and the marginal (average) treatment effect within each trial."
+#| fig-cap: "Estimated treatment effect (active vs control) as a function of baseline severity for each trial. The red dashed line at 0 indicates no treatment benefit. Negative values suggest a favorable effect of the active treatment, while positive values suggest harm. Rug marks show the distribution of baseline values. Coloured lines and dots represent, respectively, the model-based treatment-effect curves and the marginal (average) treatment effect within each trial. The dotted black line visualizes the across-trial interaction effect, showing how the average baseline severity across trials relates to the average treatment effect."
 #| label: fig-hte-centering
 #| fig-width: 8
 #| fig-height: 5
+
+# Extract coefficient estimates and 95% CIs
+ci <- confint(fit_hte_3b)
+
+gamma_w  <- coef(fit_hte_3b)["trt:cbase"]
+ci_w     <- ci["trt:cbase", ]
+
+gamma_a  <- coef(fit_hte_3b)["trt:xk_mean"]
+ci_a     <- ci["trt:xk_mean", ]
+
+# Build caption text with 2 decimal places
+caption_text <- glue::glue(
+  "Within-trial interaction: {formatC(gamma_w, format = 'f', digits = 2)} ",
+  "({formatC(ci_w[1], format = 'f', digits = 2)}; {formatC(ci_w[2], format = 'f', digits = 2)}); ",
+  "Across-trial interaction: {formatC(gamma_a, format = 'f', digits = 2)} ",
+  "({formatC(ci_a[1], format = 'f', digits = 2)}; {formatC(ci_a[2], format = 'f', digits = 2)})"
+)
+
 
 # Extract trial-level covariate means (xk_mean assumed present in df)
 trial_means <- df %>% distinct(trial, xk_mean)
@@ -863,21 +881,42 @@ baseline_means <- df %>%
 
 avg_outcome_annotated <- left_join(avg_outcome, baseline_means, by = "trial")
 
+
+# Calculate start and end of the line using model coefficients
+x_vals <- range(avg_outcome_annotated$mean_baseline, na.rm = TRUE)
+# Convert xk_mean (mean_baseline) to treatment effect using model
+y_vals <- beta_main + beta_across * x_vals
+
+df_segment <- data.frame(
+  x = x_vals[1], xend = x_vals[2],
+  y = y_vals[1], yend = y_vals[2]
+)
+
 # Plot
 ggplot(te_df, aes(x = baseline, y = treatment_effect, color = trial)) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
   geom_line(linewidth = 1.2) +
+  geom_segment(
+    data = df_segment,
+    aes(x = x, xend = xend, y = y, yend = yend),
+    inherit.aes = FALSE,
+    linetype = "dotted",
+    color = "black"
+  ) +
   geom_point(data = avg_outcome_annotated,
              aes(x = mean_baseline, y = treatment_effect, color = trial),
              size = 3, alpha = 0.7) +
+ 
   geom_rug(data = df, aes(x = baseline), inherit.aes = FALSE, sides = "b", alpha = 0.3) +
   coord_cartesian(xlim = range(df$baseline)) +
   labs(
+    caption = caption_text,
     x = "Baseline Severity",
     y = "Treatment Effect (Active vs Control)"
   ) +
   theme_minimal() +
   theme(
+    plot.caption = element_text(size = 8, hjust = 0),
     legend.position = "bottom",
     legend.title = element_blank()
   )
