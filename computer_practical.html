@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.31">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Thomas Debray">
+<meta name="dcterms.date" content="2025-06-10">
+
+<title>Computer Practical – Advanced Pooled Analyses Practicals</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-905433ffa22618bb005779f2b23c5ce0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#preparation" id="toc-preparation" class="nav-link active" data-scroll-target="#preparation"><span class="header-section-number">1</span> Preparation</a>
+  <ul class="collapse">
+  <li><a href="#install-r-and-rstudio" id="toc-install-r-and-rstudio" class="nav-link" data-scroll-target="#install-r-and-rstudio"><span class="header-section-number">1.1</span> Install R and RStudio</a></li>
+  <li><a href="#install-required-r-packages" id="toc-install-required-r-packages" class="nav-link" data-scroll-target="#install-required-r-packages"><span class="header-section-number">1.2</span> Install Required R Packages</a></li>
+  <li><a href="#download-supporting-scripts" id="toc-download-supporting-scripts" class="nav-link" data-scroll-target="#download-supporting-scripts"><span class="header-section-number">1.3</span> Download Supporting Scripts</a></li>
+  </ul></li>
+  <li><a href="#starting-the-practical" id="toc-starting-the-practical" class="nav-link" data-scroll-target="#starting-the-practical"><span class="header-section-number">2</span> Starting the Practical</a></li>
+  <li><a href="#scenario-1" id="toc-scenario-1" class="nav-link" data-scroll-target="#scenario-1"><span class="header-section-number">3</span> Scenario 1</a>
+  <ul class="collapse">
+  <li><a href="#explore-baseline-distributions" id="toc-explore-baseline-distributions" class="nav-link" data-scroll-target="#explore-baseline-distributions"><span class="header-section-number">3.1</span> Explore Baseline Distributions</a></li>
+  <li><a href="#visual-diagnostics" id="toc-visual-diagnostics" class="nav-link" data-scroll-target="#visual-diagnostics"><span class="header-section-number">3.2</span> Visual Diagnostics</a></li>
+  <li><a href="#estimation-of-treatment-effect" id="toc-estimation-of-treatment-effect" class="nav-link" data-scroll-target="#estimation-of-treatment-effect"><span class="header-section-number">3.3</span> Estimation of treatment effect</a></li>
+  </ul></li>
+  <li><a href="#scenario-2" id="toc-scenario-2" class="nav-link" data-scroll-target="#scenario-2"><span class="header-section-number">4</span> Scenario 2</a>
+  <ul class="collapse">
+  <li><a href="#explore-baseline-distributions-1" id="toc-explore-baseline-distributions-1" class="nav-link" data-scroll-target="#explore-baseline-distributions-1"><span class="header-section-number">4.1</span> Explore Baseline Distributions</a></li>
+  <li><a href="#visual-diagnostics-1" id="toc-visual-diagnostics-1" class="nav-link" data-scroll-target="#visual-diagnostics-1"><span class="header-section-number">4.2</span> Visual Diagnostics</a></li>
+  <li><a href="#estimation-of-treatment-effect-1" id="toc-estimation-of-treatment-effect-1" class="nav-link" data-scroll-target="#estimation-of-treatment-effect-1"><span class="header-section-number">4.3</span> Estimation of treatment effect</a></li>
+  </ul></li>
+  <li><a href="#scenario-3" id="toc-scenario-3" class="nav-link" data-scroll-target="#scenario-3"><span class="header-section-number">5</span> Scenario 3</a>
+  <ul class="collapse">
+  <li><a href="#visual-diagnostics-2" id="toc-visual-diagnostics-2" class="nav-link" data-scroll-target="#visual-diagnostics-2"><span class="header-section-number">5.1</span> Visual Diagnostics</a></li>
+  <li><a href="#estimation-of-treatment-effect-2" id="toc-estimation-of-treatment-effect-2" class="nav-link" data-scroll-target="#estimation-of-treatment-effect-2"><span class="header-section-number">5.2</span> Estimation of treatment effect</a></li>
+  <li><a href="#modeling-treatment-effect-modification" id="toc-modeling-treatment-effect-modification" class="nav-link" data-scroll-target="#modeling-treatment-effect-modification"><span class="header-section-number">5.3</span> Modeling treatment-effect modification</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Computer Practical</h1>
+<p class="subtitle lead">Pooled Analysis of Clinical Trial Data</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Thomas Debray </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 10, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="preparation" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Preparation</h1>
+<p>Please complete the following setup steps on your computer:</p>
+<section id="install-r-and-rstudio" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="install-r-and-rstudio"><span class="header-section-number">1.1</span> Install R and RStudio</h2>
+<ul>
+<li>Download and install R from: <a href="https://cran.r-project.org/" class="uri">https://cran.r-project.org/</a></li>
+<li>Download and install RStudio (Desktop version) from: <a href="https://posit.co/download/rstudio-desktop/" class="uri">https://posit.co/download/rstudio-desktop/</a></li>
+</ul>
+</section>
+<section id="install-required-r-packages" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="install-required-r-packages"><span class="header-section-number">1.2</span> Install Required R Packages</h2>
+<p>Open RStudio and run the following code to install the necessary packages (skip any that are already installed):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">"dplyr"</span>, <span class="st">"ggplot2"</span>, <span class="st">"lme4"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="download-supporting-scripts" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="download-supporting-scripts"><span class="header-section-number">1.3</span> Download Supporting Scripts</h2>
+<p>Ensure the following R script is saved in your working directory (i.e., the folder you will use during the practical):</p>
+<details>
+<summary>
+<strong>Show contents of simulate_trials.R</strong>
+</summary>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>simulate_trials &lt;- function(
+    baseline_means,
+    n_per_arm = 50,
+    baseline_sd_fn = function(mean) 2 + 0.2 * mean,
+    change_sd = 5,
+    cfb_active,
+    cfb_control,
+    trial_intercepts = NULL,
+    beta_W = NULL, # within-trial effect modification
+    beta_A = 0,   # across-trial effect modification
+    seed = 2025,
+    add_aux_vars = FALSE
+) {
+  set.seed(seed)
+
+  n_trials &lt;- length(baseline_means)
+
+  # Default: no shift
+  if (is.null(trial_intercepts)) {
+    trial_intercepts &lt;- rep(0, n_trials)
+  }
+
+  if (is.null(beta_W)) {
+    beta_W &lt;- rep(0, n_trials)
+  }
+
+  data_list &lt;- lapply(seq_len(n_trials), function(i) {
+    # Step 1: trial-specific mean baseline (X̄_k), around overall mean
+    xk_mean &lt;- baseline_means[i]
+
+    # Step 2: trial-specific baseline SD
+    xk_sd &lt;- baseline_sd_fn(xk_mean)
+
+    # Step 3: simulate treatment (1 = active, 0 = control)
+    trt &lt;- rep(c(1, 0), each = n_per_arm)
+
+    # Step 4: simulate baseline
+    baseline &lt;- c(
+      rnorm(n_per_arm, mean = xk_mean, sd = xk_sd),  # active
+      rnorm(n_per_arm, mean = xk_mean, sd = xk_sd)   # control
+    )
+
+    cbase &lt;- (baseline - xk_mean)
+
+    # Step 5: derive change from baseline due to treatment
+    cfb &lt;- (1-trt) * cfb_control[i]  +  trt * (cfb_active[i])
+
+    # Step 6: derive within-study interaction effect
+    cfb_tx &lt;- trt * beta_W[i] * cbase
+
+    # Step 7: compute change using within-trial and across-trial terms
+    error &lt;- rnorm(2 * n_per_arm, mean = 0, sd = change_sd)
+    outcome &lt;-  trial_intercepts[i] +
+      baseline +
+      cfb +
+      cfb_tx + # Add within-study interaction
+      beta_A * (xk_mean - mean(baseline_means)) +
+      error
+
+    data.frame(
+      trial = paste0("Trial_", i),
+      trt = trt,
+      trta = ifelse(trt == 1, "Active", "Control"),
+      intercept = trial_intercepts[i],
+      baseline = baseline,
+      cbase = cbase,
+      cfb = cfb,
+      cfb_tx = cfb_tx,
+      error = error,
+      outcome = outcome,
+      change = outcome-baseline,
+      xk_mean = xk_mean
+    )
+  })
+
+  out &lt;- do.call(rbind, data_list)
+  out &lt;- out %&gt;% mutate(trta = factor(ifelse(trt == 1, "Active", "Control"),
+                                      levels = c("Control", "Active")))
+
+  if(!add_aux_vars) {
+    out &lt;- out %&gt;% select(-c(error, intercept,
+                             cfb, cfb_tx))
+  }
+
+  return(out)
+}</code></pre>
+</div>
+</div>
+</details>
+</section>
+</section>
+<section id="starting-the-practical" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Starting the Practical</h1>
+<p>Open RStudio</p>
+<p>Load the required packages by running:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lme4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Source the simulation script to generate the dataset:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"simulate_trials.R"</span>)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This script will simulate patient-level data from multiple clinical trials. The resulting dataset will be used throughout the practical for modeling and analysis.</p>
+<p>You’re now ready to begin the exercises.</p>
+</section>
+<section id="scenario-1" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Scenario 1</h1>
+<p>Use the <code>simulate_trials()</code> function to generate five clinical trials with a continuous outcome (<code>outcome</code>), a baseline measurement (<code>baseline</code>), and two treatment arms (active and control).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">simulate_trials</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">baseline_means =</span> <span class="fu">rep</span>(<span class="dv">25</span>, <span class="dv">5</span>),</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">trial_intercepts =</span> <span class="fu">rep</span>(<span class="dv">0</span>, <span class="dv">5</span>),</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cfb_active =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="fl">9.6</span>, <span class="dv">5</span>),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cfb_control =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="fl">7.8</span>, <span class="dv">5</span>),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_per_arm =</span> <span class="dv">50</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">2025</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="explore-baseline-distributions" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="explore-baseline-distributions"><span class="header-section-number">3.1</span> Explore Baseline Distributions</h2>
+<p>Investigate the distribution of the <code>baseline</code> variable:</p>
+<ul>
+<li>Are there significant differences in baseline values between the two treatment arms within each trial?</li>
+<li>Does the baseline distribution vary between trials?</li>
+</ul>
+</section>
+<section id="visual-diagnostics" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="visual-diagnostics"><span class="header-section-number">3.2</span> Visual Diagnostics</h2>
+<p>Create a scatter plot showing individual <code>outcome</code> values as a function of <code>baseline</code>, separately for each trial. An example is given by <a href="https://www.tandfonline.com/doi/full/10.3109/00952990.2011.596980">Torgersen et al.&nbsp;(2011)</a> (Figure 2). You can generate the plot as follows:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> baseline, <span class="at">y =</span> outcome, <span class="at">color =</span> trta)) <span class="sc">+</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>trial) <span class="sc">+</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Observed Outcomes by Baseline Severity and Trial"</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Baseline Severity"</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Outcome"</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Use the plot to guide your expectations before fitting a model:</p>
+<ul>
+<li>Does the treatment effect appear to vary by trial?</li>
+<li>Does the treatment effect appear to vary with baseline severity?</li>
+<li>Based on the plot, would a naive pooled analysis (ignoring trial structure) seem appropriate?</li>
+</ul>
+</section>
+<section id="estimation-of-treatment-effect" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="estimation-of-treatment-effect"><span class="header-section-number">3.3</span> Estimation of treatment effect</h2>
+<p>We now adopt a <strong>naive pooling approach</strong>, combining data from all trials and adjusting for baseline severity. The treatment effect (active vs.&nbsp;control) is estimated as follows:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(outcome <span class="sc">~</span> trta <span class="sc">+</span> baseline, <span class="at">data =</span> df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>After fitting the model, consider the following questions:</p>
+<ul>
+<li>What is the estimated treatment effect?</li>
+<li>Is the estimated effect consistent with the visual patterns in the plot?</li>
+<li>Do you think this model provides a valid summary of the treatment effect? Why or why not?</li>
+</ul>
+<p>Now fit a stratified model that allows each trial to have its own intercept:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glm</span>(outcome <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> trial <span class="sc">+</span> trta <span class="sc">+</span> baseline, <span class="at">data =</span> df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This model accounts for differences in average outcome levels across trials, while still estimating a common treatment effect and adjusting for baseline severity.</p>
+<ul>
+<li>What is the estimated treatment effect (<code>trtaActive</code>)?</li>
+<li>Compare the trial-specific intercepts. Are they similar across trials, or is there meaningful variation?</li>
+<li>Do the intercept estimates align with what you observed in the scatter plot?</li>
+<li>Based on the model output, does the stratified approach seem more appropriate than the naive pooled analysis? Justify your answer.</li>
+</ul>
+</section>
+</section>
+<section id="scenario-2" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Scenario 2</h1>
+<p>Use the <code>simulate_trials()</code> function to generate five clinical trials with a continuous outcome, a baseline measurement, and two treatment arms. This time, we introduce systematic differences across trials:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">simulate_trials</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">baseline_means =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">25</span>, <span class="dv">25</span>, <span class="dv">30</span>, <span class="dv">35</span>),     </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">trial_intercepts =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="dv">15</span>),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cfb_active =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="fl">9.6</span>,<span class="dv">5</span>),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cfb_control =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="fl">7.8</span>,<span class="dv">5</span>),</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_per_arm =</span> <span class="dv">50</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">2025</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="explore-baseline-distributions-1" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="explore-baseline-distributions-1"><span class="header-section-number">4.1</span> Explore Baseline Distributions</h2>
+<p>Investigate the distribution of the <code>baseline</code> variable:</p>
+<ul>
+<li>Are there significant differences in baseline values between the two treatment arms within each trial?</li>
+<li>Does the baseline distribution vary between trials?</li>
+</ul>
+</section>
+<section id="visual-diagnostics-1" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="visual-diagnostics-1"><span class="header-section-number">4.2</span> Visual Diagnostics</h2>
+<p>Create a scatter plot showing individual <code>outcome</code> values as a function of <code>baseline</code>, separately for each trial. Use the plot to guide your expectations before fitting a model:</p>
+<ul>
+<li>Does the treatment effect appear to vary by trial?</li>
+<li>Does the treatment effect appear to vary with baseline severity?</li>
+<li>Based on the plot, would a naive pooled analysis (ignoring trial structure) seem appropriate?</li>
+</ul>
+</section>
+<section id="estimation-of-treatment-effect-1" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="estimation-of-treatment-effect-1"><span class="header-section-number">4.3</span> Estimation of treatment effect</h2>
+<ul>
+<li>Estimate the treatment effect using naive pooling.</li>
+<li>Estimate the treatment effect using a stratified model.</li>
+<li>Compare the results of the two models. How do they differ in terms of treatment effect estimates and trial intercepts?</li>
+</ul>
+<p>Instead of estimating a separate fixed intercept for each trial, we can model trial-specific intercepts as random effects. This approach assumes that the intercepts for each trial are not fixed but drawn from a common normal distribution.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lmer</span>(outcome <span class="sc">~</span>  trta <span class="sc">+</span> baseline <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>trial), <span class="at">data =</span> df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>Extract the estimated effects using the function <code>coef()</code></li>
+<li>What is the estimated treatment effect?</li>
+<li>What are the estimated trial-specific intercepts?</li>
+<li>How do these intercepts compare to those from the stratified model? <strong>Tip</strong>: You may compare the standard deviation of the trial intercepts across models to assess how much variability is captured or shrunk in the random-effects approach.</li>
+</ul>
+</section>
+</section>
+<section id="scenario-3" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Scenario 3</h1>
+<p>Use the <code>simulate_trials()</code> function to generate five clinical trials with a continuous outcome, a baseline measurement, and two treatment arms. This time, we introduce heterogeneity in the treatment effect.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">simulate_trials</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">baseline_means =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">25</span>, <span class="dv">25</span>, <span class="dv">30</span>, <span class="dv">35</span>),     </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">trial_intercepts =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="dv">15</span>),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cfb_active =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="fl">9.6</span>,<span class="dv">5</span>),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cfb_control =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="fl">7.8</span>,<span class="dv">5</span>),</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_per_arm =</span> <span class="dv">50</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_W =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="fl">0.15</span>,<span class="dv">5</span>),  </span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_A =</span> <span class="fl">0.35</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">2025</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="visual-diagnostics-2" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="visual-diagnostics-2"><span class="header-section-number">5.1</span> Visual Diagnostics</h2>
+<p>Create a scatter plot showing individual <code>outcome</code> values as a function of <code>baseline</code>, separately for each trial. Use the plot to guide your expectations before fitting a model:</p>
+<ul>
+<li>Does the treatment effect appear to vary by trial?</li>
+<li>Does the treatment effect appear to vary with baseline severity?</li>
+<li>Based on the plot, would a naive pooled analysis (ignoring trial structure) seem appropriate?</li>
+</ul>
+</section>
+<section id="estimation-of-treatment-effect-2" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="estimation-of-treatment-effect-2"><span class="header-section-number">5.2</span> Estimation of treatment effect</h2>
+<p>In this scenario, we investigate the presence of heterogeneous treatment effects using a linear mixed model with random slopes for treatment and fixed intercepts by trial:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lmer</span>(outcome <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> trial <span class="sc">+</span>  baseline<span class="sc">:</span>trial <span class="sc">+</span> trt <span class="sc">+</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>       (<span class="dv">0</span> <span class="sc">+</span> trt <span class="sc">|</span> trial), <span class="at">data =</span> df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In this formula:</p>
+<ul>
+<li><code>-1 + trial</code>: Fixed intercept per trial</li>
+<li><code>baseline:trial</code> Fixed effect for baseline severity per trial</li>
+<li><code>trt</code>: Pooled treatment effect</li>
+<li><code>(0 + trt | trial)</code>: Random treatment effect per trial</li>
+</ul>
+<p>We can extract key parameters as follows:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pooled treatment effect</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fixef</span>(fit)[<span class="st">"trt"</span>]</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard error of the treatment effect</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">vcov</span>(fit)[<span class="st">"trt"</span>, <span class="st">"trt"</span>])</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Between-study variance of the treatment effect</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="fu">VarCorr</span>(fit)<span class="sc">$</span>trial[<span class="st">"trt"</span>, <span class="st">"trt"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Use the estimates above to derive an approximate 95% confidence interval and 95% prediction interval for the treatment effect.</p>
+<p>Based on the model output:</p>
+<ul>
+<li>What is the estimated between-trial variance of the treatment effect (τ²)?</li>
+<li>How does the 95% prediction interval compare to the confidence interval of the pooled treatment effect?</li>
+<li>Do the trial-specific treatment effects (from the plot or model output) vary meaningfully across trials?</li>
+<li>What might this imply about the assumption of a common treatment effect?</li>
+</ul>
+<p>Optional: Plot the trial-specific treatment effects and overlay the pooled estimate with its prediction interval.</p>
+</section>
+<section id="modeling-treatment-effect-modification" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="modeling-treatment-effect-modification"><span class="header-section-number">5.3</span> Modeling treatment-effect modification</h2>
+<p>We suspect that the heterogeneity in treatment effect may be explained by differences in baseline severity across patients. To explore this, we include a common interaction effect between treatment and baseline in the model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lmer</span>(outcome <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> trial <span class="sc">+</span> baseline<span class="sc">:</span>trial <span class="sc">+</span> trt <span class="sc">+</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>       trt<span class="sc">:</span>baseline <span class="sc">+</span> (<span class="dv">0</span> <span class="sc">+</span> trt <span class="sc">|</span> trial) , <span class="at">data =</span> df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>Which parameter in the model quantifies the pooled interaction effect?</li>
+<li>What does the <em>sign</em> and <em>magnitude</em> of the interaction coefficient (<code>trt:baseline</code>) tell you?</li>
+<li>How should we interpret this interaction term in the context of treatment-effect modification?</li>
+<li>Is the model appropriate for separating within- and across-study interaction effects?</li>
+<li>How can we evaluate whether residual heterogeneity in treatment effect remains, despite modeling the interaction?</li>
+</ul>
+<p>We now fit a regression model that explicitly separates within- from across-trial interaction:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lmer</span>(outcome <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> trial <span class="sc">+</span> baseline<span class="sc">:</span>trial <span class="sc">+</span> trt<span class="sc">:</span>trial <span class="sc">+</span> </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>       trt<span class="sc">:</span>baseline <span class="sc">+</span> (<span class="dv">0</span> <span class="sc">+</span> trt<span class="sc">:</span>baseline <span class="sc">|</span> trial) , <span class="at">data =</span> df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In this formula:</p>
+<ul>
+<li><code>-1 + trial</code>: Fixed intercept per trial</li>
+<li><code>baseline:trial</code>: Fixed effect for baseline severity per trial</li>
+<li><code>trt:trial</code> : Fixed treatment effect per trial</li>
+<li><code>baseline:trt</code>: Pooled within-study interaction between baseline and treatment</li>
+<li><code>(0 + trt:baseline | trial)</code>: Trial-specific deviations from the pooled interaction</li>
+</ul>
+<p><strong>Questions for Discussion</strong></p>
+<ul>
+<li>How does this model help distinguish within- from across-trial interactions?</li>
+<li>What does the variance component for the random slope <code>(0 + trt:baseline | trial)</code> represent?</li>
+<li>How can we use this model to examine inconsistency or effect modification across trials?</li>
+</ul>
+<p>Finally, we consider an extended model that also adjusts for trial-level confounding using study-level means:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lmer</span>(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  outcome <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> trial <span class="sc">+</span> trt <span class="sc">+</span> trial<span class="sc">:</span>baseline <span class="sc">+</span> trt<span class="sc">:</span>cbase <span class="sc">+</span>xk_mean<span class="sc">:</span>trt<span class="sc">+</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">0</span> <span class="sc">+</span> trt <span class="sc">|</span> trial) <span class="sc">+</span> (<span class="dv">0</span> <span class="sc">+</span> trt<span class="sc">:</span>cbase <span class="sc">|</span> trial),</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In this formula:</p>
+<ul>
+<li><code>xk_mean:trt</code>: Common effect for study-level confounding</li>
+<li><code>trt:cbase</code>: Pooled within-study interaction between baseline and treatment</li>
+<li><code>(0 + trt | trial)</code>: Random treatment effects</li>
+<li><code>(0 + trt:cbase | trial)</code>: Random interaction effects</li>
+</ul>
+<p><strong>Questions for Discussion</strong></p>
+<ul>
+<li>What role does <code>xk_mean:trt</code> play in this model? How does it address ecological bias?</li>
+<li>Under what conditions might the inclusion of study-level means improve model validity?</li>
+<li>How do you interpret the presence of both fixed and random interaction terms in this model?</li>
+<li>Would you expect this model to reduce between-trial heterogeneity in treatment effects? Why or why not?</li>
+</ul>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

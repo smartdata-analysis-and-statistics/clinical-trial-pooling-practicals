@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.31">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Thomas Debray">
+<meta name="dcterms.date" content="2025-06-10">
+
+<title>Hierarchical Modeling – Advanced Pooled Analyses Practicals</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-905433ffa22618bb005779f2b23c5ce0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#scenario-1-pooling-homogeneous-trials" id="toc-scenario-1-pooling-homogeneous-trials" class="nav-link active" data-scroll-target="#scenario-1-pooling-homogeneous-trials"><span class="header-section-number">1</span> Scenario 1: Pooling Homogeneous Trials</a>
+  <ul class="collapse">
+  <li><a href="#simulating-data" id="toc-simulating-data" class="nav-link" data-scroll-target="#simulating-data"><span class="header-section-number">1.1</span> Simulating data</a></li>
+  <li><a href="#estimating-the-pooled-treatment-effect" id="toc-estimating-the-pooled-treatment-effect" class="nav-link" data-scroll-target="#estimating-the-pooled-treatment-effect"><span class="header-section-number">1.2</span> Estimating the Pooled Treatment Effect</a></li>
+  </ul></li>
+  <li><a href="#scenario-2-pooling-trials-with-heterogeneous-baseline-risk" id="toc-scenario-2-pooling-trials-with-heterogeneous-baseline-risk" class="nav-link" data-scroll-target="#scenario-2-pooling-trials-with-heterogeneous-baseline-risk"><span class="header-section-number">2</span> Scenario 2: Pooling Trials with heterogeneous baseline risk</a>
+  <ul class="collapse">
+  <li><a href="#simulating-data-1" id="toc-simulating-data-1" class="nav-link" data-scroll-target="#simulating-data-1"><span class="header-section-number">2.1</span> Simulating Data</a></li>
+  <li><a href="#estimating-the-pooled-treatment-effect-1" id="toc-estimating-the-pooled-treatment-effect-1" class="nav-link" data-scroll-target="#estimating-the-pooled-treatment-effect-1"><span class="header-section-number">2.2</span> Estimating the Pooled Treatment Effect</a></li>
+  </ul></li>
+  <li><a href="#scenario-3-pooling-trials-with-heterogeneous-baseline-risk-and-treatment-effect" id="toc-scenario-3-pooling-trials-with-heterogeneous-baseline-risk-and-treatment-effect" class="nav-link" data-scroll-target="#scenario-3-pooling-trials-with-heterogeneous-baseline-risk-and-treatment-effect"><span class="header-section-number">3</span> Scenario 3: Pooling Trials with heterogeneous baseline risk and treatment effect</a>
+  <ul class="collapse">
+  <li><a href="#simulating-data-2" id="toc-simulating-data-2" class="nav-link" data-scroll-target="#simulating-data-2"><span class="header-section-number">3.1</span> Simulating Data</a></li>
+  <li><a href="#estimating-the-pooled-treatment-effect-2" id="toc-estimating-the-pooled-treatment-effect-2" class="nav-link" data-scroll-target="#estimating-the-pooled-treatment-effect-2"><span class="header-section-number">3.2</span> Estimating the Pooled Treatment Effect</a></li>
+  <li><a href="#sec-stratifiedREmodel" id="toc-sec-stratifiedREmodel" class="nav-link" data-scroll-target="#sec-stratifiedREmodel"><span class="header-section-number">3.3</span> Assessing Between-Trial Heterogeneity in Treatment Effects</a></li>
+  <li><a href="#investigating-effect-modification" id="toc-investigating-effect-modification" class="nav-link" data-scroll-target="#investigating-effect-modification"><span class="header-section-number">3.4</span> Investigating effect modification</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Hierarchical Modeling</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Thomas Debray </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 10, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="scenario-1-pooling-homogeneous-trials" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Scenario 1: Pooling Homogeneous Trials</h1>
+<p>In this example, we consider a scenario in which <strong>all trials are homogeneous</strong> — that is, they share similar designs, patient populations, and a consistent treatment effect.</p>
+<section id="simulating-data" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="simulating-data"><span class="header-section-number">1.1</span> Simulating data</h2>
+<p>We simulate 5 trials, each with the following characteristics:</p>
+<ul>
+<li>1:1 randomization between treatment and control arms<br>
+</li>
+<li>Patients drawn from the same underlying population<br>
+</li>
+<li>Identical baseline severity distribution across trials<br>
+</li>
+<li>A constant treatment effect with no variation across trials</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"R/simulate_trials.R"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulate 5 trials with 100 patients each (50 per arm)</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">simulate_trials</span>(</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">baseline_means =</span> <span class="fu">rep</span>(<span class="dv">25</span>, <span class="dv">5</span>) , <span class="co"># Common mean baseline</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">trial_intercepts =</span> <span class="fu">rep</span>(<span class="dv">0</span>,<span class="dv">5</span>), <span class="co"># No heterogeneity in outcome levels</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">cfb_active =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="fl">9.6</span>,<span class="dv">5</span>),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">cfb_control =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="fl">7.8</span>,<span class="dv">5</span>),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_per_arm =</span> <span class="dv">50</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-striped table-hover caption-top table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Trial</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">N</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Baseline (Active) Mean (SD)</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Baseline (Control) Mean (SD)</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Baseline (Overall) Mean (SD)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Trial_1</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">26.1 (7.0)</td>
+<td style="text-align: left;">23.9 (7.2)</td>
+<td style="text-align: left;">25.0 (7.1)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Trial_2</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">24.4 (6.8)</td>
+<td style="text-align: left;">25.7 (7.0)</td>
+<td style="text-align: left;">25.1 (6.9)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Trial_3</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">25.5 (6.5)</td>
+<td style="text-align: left;">24.8 (7.5)</td>
+<td style="text-align: left;">25.2 (7.0)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Trial_4</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">26.6 (7.1)</td>
+<td style="text-align: left;">23.6 (7.6)</td>
+<td style="text-align: left;">25.1 (7.4)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Trial_5</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">25.8 (4.9)</td>
+<td style="text-align: left;">25.2 (6.6)</td>
+<td style="text-align: left;">25.5 (5.8)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="estimating-the-pooled-treatment-effect" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="estimating-the-pooled-treatment-effect"><span class="header-section-number">1.2</span> Estimating the Pooled Treatment Effect</h2>
+<p><a href="#fig-naive-pooling" class="quarto-xref">Figure&nbsp;1</a> visualizes the relationship between baseline severity and change from baseline within each treatment arm using a naively pooled analysis.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-naive-pooling" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-naive-pooling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="hiearachical_modeling_files/figure-html/fig-naive-pooling-1.png" class="img-fluid figure-img" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-naive-pooling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Observed Change from Baseline in Scenario 1
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The plot shows that:</p>
+<ul>
+<li>The mean change in the active group is -10</li>
+<li>The mean change in the control group is -7.6</li>
+</ul>
+<section id="naive-analysis" class="level3" data-number="1.2.1">
+<h3 data-number="1.2.1" class="anchored" data-anchor-id="naive-analysis"><span class="header-section-number">1.2.1</span> Naive Analysis</h3>
+<p>We begin by estimating the pooled treatment effect using a simple regression model that adjusts for baseline severity but ignores trial structure. This reflects a naive analysis:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>((fit_naive <span class="ot">&lt;-</span> <span class="fu">glm</span>(outcome <span class="sc">~</span> trta <span class="sc">+</span> baseline, <span class="at">data =</span> df)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:  glm(formula = outcome ~ trta + baseline, data = df)
+
+Coefficients:
+(Intercept)   trtaActive     baseline  
+    -7.5005      -2.4818       0.9979  
+
+Degrees of Freedom: 499 Total (i.e. Null);  497 Residual
+Null Deviance:      36140 
+Residual Deviance: 12620    AIC: 3041</code></pre>
+</div>
+</div>
+<p>In this naive model, the estimated treatment effect is:</p>
+<p>Treatment effect: -2.48 (95% CI: -3.37 to -1.60)</p>
+<p>The figure below visualizes <code>fit_naive</code> by showing predicted outcomes across baseline severity values for each treatment group, alongside the observed data.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-model-fit-naive" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-model-fit-naive-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="hiearachical_modeling_files/figure-html/fig-model-fit-naive-1.png" class="img-fluid figure-img" width="768">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-model-fit-naive-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Model-Predicted and Observed Outcomes from Naive Pooled Analysis by Treatment Group
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="stratified-analysis-by-trial" class="level3" data-number="1.2.2">
+<h3 data-number="1.2.2" class="anchored" data-anchor-id="stratified-analysis-by-trial"><span class="header-section-number">1.2.2</span> Stratified Analysis by Trial</h3>
+<p>Next, we fit a stratified model that accounts for trial-specific intercepts by including trial as a fixed effect (without a global intercept). This approach allows each trial to have its own baseline level of the outcome, effectively adjusting for differences in average outcomes across trials.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>((fit_stratified <span class="ot">&lt;-</span> <span class="fu">glm</span>(outcome <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> trial <span class="sc">+</span> trta <span class="sc">+</span> baseline, <span class="at">data =</span> df)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:  glm(formula = outcome ~ -1 + trial + trta + baseline, data = df)
+
+Coefficients:
+trialTrial_1  trialTrial_2  trialTrial_3  trialTrial_4  trialTrial_5  
+     -7.3626       -7.7004       -7.0886       -7.7760       -7.5772  
+  trtaActive      baseline  
+     -2.4819        0.9979  
+
+Degrees of Freedom: 500 Total (i.e. Null);  493 Residual
+Null Deviance:      170100 
+Residual Deviance: 12590    AIC: 3048</code></pre>
+</div>
+</div>
+<p>This model yields the following treatment effect estimate (<code>trtaActive</code>), which is adjusted for trial-level differences and baseline covariates.</p>
+<p>Treatment effect: -2.48 (95% CI: -3.37 to -1.59)</p>
+<p>Note that all trial-specific intercepts are fairly similar (ranging from approximately -7.78 to -7.09), which suggests there is no strong ‘trial effect’ in the data. This is consistent with how the data were simulated — the underlying outcome-generating mechanism assumed comparable average outcomes across trials, apart from random noise.</p>
+<p>The homogeneity in trial-specific intercepts suggests that a naively pooled model with a global intercept could be reasonable in this scenario. However, this remains a strong assumption — even small differences across trials can introduce bias if not properly accounted for. Stratifying by trial offers a more robust approach by explicitly modeling these differences, even when they appear minor.</p>
+</section>
+</section>
+</section>
+<section id="scenario-2-pooling-trials-with-heterogeneous-baseline-risk" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Scenario 2: Pooling Trials with heterogeneous baseline risk</h1>
+<p>In this second scenario, we consider a setting in which trials differ in baseline severity and average outcome levels, as might occur when studies are conducted in distinct clinical environments or patient populations.</p>
+<section id="simulating-data-1" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="simulating-data-1"><span class="header-section-number">2.1</span> Simulating Data</h2>
+<p>In this scenario, we simulate five clinical trials that share a <strong>common treatment effect</strong>. However, the trials differ systematically in terms of participant eligibility criteria and overall prognosis:</p>
+<ul>
+<li>Trial 1 enrolls patients with the lowest baseline severity (mean = 20) and has a +5 intercept shift, resulting in higher overall outcome scores.</li>
+<li>Trial 4 includes patients with moderately higher baseline severity (mean = 30) and includes a −10 intercept shift, reducing overall outcome scores.</li>
+<li>Trial 5 involves the most severely affected patients (mean baseline = 35) and applies a −15 intercept shift, resulting in even lower outcome levels.</li>
+</ul>
+<p>These shifts simulate trials enrolling progressively more severe populations, which report lower average outcomes across both treatment arms — despite having the same true treatment effect. This setup reflects a realistic source of between-trial heterogeneity.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulate 5 trials with 100 patients each (50 per arm)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">simulate_trials</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">baseline_means =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">25</span>, <span class="dv">25</span>, <span class="dv">30</span>, <span class="dv">35</span>),     </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">trial_intercepts =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="dv">15</span>),  </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cfb_active =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="fl">9.6</span>,<span class="dv">5</span>),</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">cfb_control =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="fl">7.8</span>,<span class="dv">5</span>),</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_per_arm =</span> <span class="dv">50</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-striped table-hover caption-top table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Trial</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">N</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Baseline (Active) Mean (SD)</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Baseline (Control) Mean (SD)</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Baseline (Overall) Mean (SD)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Trial_1</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">20.9 (6.0)</td>
+<td style="text-align: left;">19.0 (6.1)</td>
+<td style="text-align: left;">20.0 (6.1)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Trial_2</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">24.4 (6.8)</td>
+<td style="text-align: left;">25.7 (7.0)</td>
+<td style="text-align: left;">25.1 (6.9)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Trial_3</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">25.5 (6.5)</td>
+<td style="text-align: left;">24.8 (7.5)</td>
+<td style="text-align: left;">25.2 (7.0)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Trial_4</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">31.8 (8.1)</td>
+<td style="text-align: left;">28.4 (8.7)</td>
+<td style="text-align: left;">30.1 (8.5)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Trial_5</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">36.0 (6.3)</td>
+<td style="text-align: left;">35.3 (8.5)</td>
+<td style="text-align: left;">35.7 (7.5)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="estimating-the-pooled-treatment-effect-1" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="estimating-the-pooled-treatment-effect-1"><span class="header-section-number">2.2</span> Estimating the Pooled Treatment Effect</h2>
+<p><a href="#fig-naive-pooling-scenario2" class="quarto-xref">Figure&nbsp;3</a> visualizes the relationship between baseline severity and change from baseline within each treatment arm. The figure shows that:</p>
+<ul>
+<li>Patients with higher baseline severity tend to show larger improvements (greater negative change).</li>
+<li>The active treatment group consistently shows a greater mean improvement than the control group, across all levels of baseline severity.</li>
+</ul>
+<p>Although no effect modification was simulated in this scenario, the figure illustrates how even pooled data can suggest patterns that may reflect underlying trial design or population heterogeneity.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-naive-pooling-scenario2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-naive-pooling-scenario2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="hiearachical_modeling_files/figure-html/fig-naive-pooling-scenario2-1.png" class="img-fluid figure-img" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-naive-pooling-scenario2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Observed Change from Baseline in Scenario 2.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<section id="naive-analysis-1" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="naive-analysis-1"><span class="header-section-number">2.2.1</span> Naive Analysis</h3>
+<p>We again begin by estimating the pooled treatment effect using a simple regression model that adjusts for baseline severity but ignores potential heterogeneity across trials — that is, it assumes all patients come from a single trial.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fit_naive <span class="ot">&lt;-</span> <span class="fu">glm</span>(outcome <span class="sc">~</span> trta <span class="sc">+</span> baseline, <span class="at">data =</span> df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In this naive model, we obtain:</p>
+<p>Treatment effect: -1.96 (95% CI: -3.34 to -0.57)</p>
+<p>This result suggests a beneficial treatment effect, but it ignores systematic differences between trials — such as varying patient populations or outcome levels — which can lead to biased estimates.</p>
+<p>The figure below visualizes <code>fit_naive</code> by showing predicted outcomes across baseline severity values for each treatment group, alongside the observed data.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-model-fit-naive-scenario2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-model-fit-naive-scenario2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="hiearachical_modeling_files/figure-html/fig-model-fit-naive-scenario2-1.png" class="img-fluid figure-img" width="768">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-model-fit-naive-scenario2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Model-Predicted and Observed Outcomes from Naive Pooled Analysis by Treatment Group
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Given the data observed in <a href="#fig-naive-pooling-scenario2" class="quarto-xref">Figure&nbsp;3</a>, we may think that there is effect modification by baseline severity, with the treatment effect appearing larger in patients with higher baseline severity. We can estimate this as follows:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fit_naive_hte <span class="ot">&lt;-</span> <span class="fu">glm</span>(outcome <span class="sc">~</span> trta <span class="sc">+</span> baseline <span class="sc">+</span> trta<span class="sc">*</span>baseline, <span class="at">data =</span> df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="stratified-analysis-by-trial-1" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="stratified-analysis-by-trial-1"><span class="header-section-number">2.2.2</span> Stratified Analysis by Trial</h3>
+<p>To better account for between-trial differences, we now fit a stratified regression model by including trial-specific intercepts (i.e., one intercept per trial):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>((fit_stratified <span class="ot">&lt;-</span> <span class="fu">glm</span>(outcome <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> trial <span class="sc">+</span> trta <span class="sc">+</span> baseline, <span class="at">data =</span> df)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:  glm(formula = outcome ~ -1 + trial + trta + baseline, data = df)
+
+Coefficients:
+trialTrial_1  trialTrial_2  trialTrial_3  trialTrial_4  trialTrial_5  
+     -2.3723       -7.6997       -7.0878      -17.7647      -22.5552  
+  trtaActive      baseline  
+     -2.4817        0.9979  
+
+Degrees of Freedom: 500 Total (i.e. Null);  493 Residual
+Null Deviance:      145300 
+Residual Deviance: 12590    AIC: 3048</code></pre>
+</div>
+</div>
+<p>This model allows each trial to have its own average outcome level at baseline, while still estimating a common treatment effect and adjusting for baseline severity.</p>
+<p>Let’s visualize the stratified model predictions to understand how trial-specific baselines affect the outcome estimates.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_outcome_predictions_by_treatment</span>(fit_stratified)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-model-fit-stratified" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-model-fit-stratified-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="hiearachical_modeling_files/figure-html/fig-model-fit-stratified-1.png" class="img-fluid figure-img" width="768">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-model-fit-stratified-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Observed and model-predicted outcomes by treatment group, with trial-specific intercepts. Each line represents a trial-level regression adjusted for baseline severity.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>This plot illustrates how each trial follows its own fitted regression line, while the treatment effect (i.e., the difference between active and control) remains consistent across trials.</p>
+<p>As shown in <a href="#fig-model-fit-stratified" class="quarto-xref">Figure&nbsp;5</a>, the trial-specific intercepts range from approximately -22.56 to -2.37, reflecting substantial differences in outcome levels across trials at baseline. These shifts arise from differences in the trial populations and illustrate why a naive pooled analysis (which ignores these differences) is inappropriate.</p>
+<p>This substantial variation indicates that a naive pooling approach is no longer appropriate. Stratifying by trial ensures these baseline differences are accounted for, improving the validity of the treatment effect estimate.</p>
+<p>The naive model estimated a treatment effect of -1.96 (SE = 0.71), without accounting for trial heterogeneity. In contrast, the stratified model — which adjusts for between-trial differences — yields a more precise estimate of -2.48 (SE = 0.45).</p>
+</section>
+<section id="random-trial-effects" class="level3" data-number="2.2.3">
+<h3 data-number="2.2.3" class="anchored" data-anchor-id="random-trial-effects"><span class="header-section-number">2.2.3</span> Random trial effects</h3>
+<p>Instead of estimating a separate fixed intercept for each trial, we can model <strong>trial-specific intercepts as random effects</strong>. This approach assumes that the intercepts for each trial are not unique parameters but are instead drawn from a <strong>common normal distribution</strong>. In practice, this means we estimate only the mean and standard deviation of the trial intercepts — reducing the number of parameters and increasing efficiency, especially when the number of trials is large or when each trial has limited data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lme4)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>((fit_random <span class="ot">&lt;-</span> <span class="fu">lmer</span>(outcome <span class="sc">~</span>  trta <span class="sc">+</span> baseline <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>trial), <span class="at">data =</span> df)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: outcome ~ trta + baseline + (1 | trial)
+   Data: df
+REML criterion at convergence: 3064.33
+Random effects:
+ Groups   Name        Std.Dev.
+ trial    (Intercept) 8.318   
+ Residual             5.053   
+Number of obs: 500, groups:  trial, 5
+Fixed Effects:
+(Intercept)   trtaActive     baseline  
+   -11.4222      -2.4787       0.9951  </code></pre>
+</div>
+</div>
+<p>Recall the stratified model — which adjusts for between-trial differences — yielded a treatment effect of -2.48 (SE = 0.45). The random effects model produces a similar point estimate of -2.48, with the same standard error (SE = 0.45).</p>
+<p>Although the results align in this example, the two approaches rely on different assumptions — and in other contexts, these assumptions can materially affect the estimated treatment effect.</p>
+<p>The global fixed-effect estimates from the random-effects model are:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fixef</span>(fit_random)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept)  trtaActive    baseline 
+ -11.422190   -2.478738    0.995145 </code></pre>
+</div>
+</div>
+<p>These represent the overall average outcome level, treatment effect, and baseline slope across all trials.</p>
+<p>We can extract the trial-specific intercept deviations from the global mean intercept (-11.42) as follows.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ranef</span>(fit_random)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$trial
+        (Intercept)
+Trial_1    9.070208
+Trial_2    3.776434
+Trial_3    4.386367
+Trial_4   -6.237760
+Trial_5  -10.995250
+
+with conditional variances for "trial" </code></pre>
+</div>
+</div>
+<p>By design, the mean of these random effects is zero.</p>
+<p>While the random effects approach is attractive for its parsimony and ability to borrow strength across trials, it can introduce bias in the trial-specific intercept terms (and thereby introduce bias in the pooled treatment effect). In the table below, we compare the intercepts estimated by the stratified model (fixed effects) with those from the random effects model.</p>
+<div class="cell">
+<div id="tbl-fixed-vs-random-intercepts" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-fixed-vs-random-intercepts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Comparison of Trial-Specific Intercepts Estimated from Stratified and Random Effects Models.
+</figcaption>
+<div aria-describedby="tbl-fixed-vs-random-intercepts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="table table-striped table-hover do-not-create-environment cell caption-top table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Trial</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Intercept (Stratified Trial Effects)</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Intercept (Random Trial Effects)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Trial_1</td>
+<td style="text-align: left;">-2.37</td>
+<td style="text-align: left;">-2.35</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Trial_2</td>
+<td style="text-align: left;">-7.70</td>
+<td style="text-align: left;">-7.65</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Trial_3</td>
+<td style="text-align: left;">-7.09</td>
+<td style="text-align: left;">-7.04</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Trial_4</td>
+<td style="text-align: left;">-17.76</td>
+<td style="text-align: left;">-17.66</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Trial_5</td>
+<td style="text-align: left;">-22.56</td>
+<td style="text-align: left;">-22.42</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>As shown in <a href="#tbl-fixed-vs-random-intercepts" class="quarto-xref">Table&nbsp;1</a>, the estimated trial intercepts differ slightly between the stratified model and the random-intercepts model. The stratified model estimates a separate fixed intercept for each trial, capturing trial-specific baseline differences directly. In contrast, the random-effects model assumes that intercepts arise from a common distribution, and applies shrinkage toward the overall mean.</p>
+<p>This shrinkage reduces variability across trials and can lead to bias in the estimated intercepts – particularly if true trial effects differ systematically. This is reflected in the standard deviations of the trial intercepts: 8.35 for the stratified model versus 8.30 under the random-effects model, confirming a modest degree of shrinkage. Although this reduction in variability appears small, even modest shrinkage can introduce bias in the treatment effect estimate – especially when trial-level outcome differences are correlated with treatment assignment or patient characteristics. This risk is why, in pooled analyses and multi-trial synthesis, stratifying by trial using fixed effects is often preferred. Fixed-effect models estimate each trial’s intercept independently, thus preserving true baseline differences and avoiding bias introduced by shrinkage.</p>
+</section>
+</section>
+</section>
+<section id="scenario-3-pooling-trials-with-heterogeneous-baseline-risk-and-treatment-effect" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Scenario 3: Pooling Trials with heterogeneous baseline risk and treatment effect</h1>
+<p>In this third scenario, we consider a setting in which trials differ in baseline severity and average outcome levels, and where the treatment effect is modified by baseline severity.</p>
+<section id="simulating-data-2" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="simulating-data-2"><span class="header-section-number">3.1</span> Simulating Data</h2>
+<p>In this scenario, we simulate five clinical trials that are identical in design and treatment effect. However, <strong>Trials 4 and 5</strong> differ systematically from Trials 1–3:</p>
+<ul>
+<li>Trial 1 enrolls patients with the lowest baseline severity (mean = 20) and has a +5 intercept shift, indicating higher overall outcomes.</li>
+<li>Trial 4 enrolls patients with moderately higher baseline severity (mean = 30) and includes a −10 intercept shift, lowering overall outcomes.</li>
+<li>Trial 5 enrolls patients with the highest baseline severity (mean = 35) and includes a stronger −15 intercept shift to further reduce outcome levels.</li>
+</ul>
+<p>These shifts simulate trials that include more severely affected populations and report lower outcome scores across both treatment arms, despite having the same true treatment effect. This setup reflects a realistic source of between-trial heterogeneity.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">simulate_trials</span>(</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">baseline_means =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">25</span>, <span class="dv">25</span>, <span class="dv">30</span>, <span class="dv">35</span>),     </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">trial_intercepts =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="dv">15</span>),</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cfb_active =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="fl">9.6</span>,<span class="dv">5</span>),</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cfb_control =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="fl">7.8</span>,<span class="dv">5</span>),</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_per_arm =</span> <span class="dv">50</span>,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_W =</span> <span class="fu">rep</span>(<span class="sc">-</span><span class="fl">0.15</span>,<span class="dv">5</span>),  </span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_A =</span> <span class="fl">0.35</span>,</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">2025</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-striped table-hover caption-top table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Trial</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">N</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Baseline (Active) Mean (SD)</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Baseline (Control) Mean (SD)</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Baseline (Overall) Mean (SD)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Trial_1</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">20.9 (6.0)</td>
+<td style="text-align: left;">19.0 (6.1)</td>
+<td style="text-align: left;">20.0 (6.1)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Trial_2</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">24.4 (6.8)</td>
+<td style="text-align: left;">25.7 (7.0)</td>
+<td style="text-align: left;">25.1 (6.9)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Trial_3</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">25.5 (6.5)</td>
+<td style="text-align: left;">24.8 (7.5)</td>
+<td style="text-align: left;">25.2 (7.0)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Trial_4</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">31.8 (8.1)</td>
+<td style="text-align: left;">28.4 (8.7)</td>
+<td style="text-align: left;">30.1 (8.5)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Trial_5</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">36.0 (6.3)</td>
+<td style="text-align: left;">35.3 (8.5)</td>
+<td style="text-align: left;">35.7 (7.5)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="estimating-the-pooled-treatment-effect-2" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="estimating-the-pooled-treatment-effect-2"><span class="header-section-number">3.2</span> Estimating the Pooled Treatment Effect</h2>
+<p><a href="#fig-naive-pooling-scenario3" class="quarto-xref">Figure&nbsp;6</a> visualizes the relationship between baseline severity and change from baseline within each treatment arm. The figure shows that:</p>
+<ul>
+<li>Patients with higher baseline severity tend to show larger improvements (greater negative change).</li>
+<li>The active treatment group shows a greater mean improvement than the control group.</li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-naive-pooling-scenario3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-naive-pooling-scenario3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="hiearachical_modeling_files/figure-html/fig-naive-pooling-scenario3-1.png" class="img-fluid figure-img" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-naive-pooling-scenario3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Observed Change from Baseline in Scenario 3.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="sec-stratifiedREmodel" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="sec-stratifiedREmodel"><span class="header-section-number">3.3</span> Assessing Between-Trial Heterogeneity in Treatment Effects</h2>
+<p>We investigate between-trial heterogeneity in treatment effects using a linear mixed model with random slopes for treatment and fixed intercepts by trial:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fit_random_hte <span class="ot">&lt;-</span> <span class="fu">lmer</span>(outcome <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> trial <span class="sc">+</span> baseline<span class="sc">:</span>trial <span class="sc">+</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                         trt <span class="sc">+</span> (<span class="dv">0</span> <span class="sc">+</span> trt <span class="sc">|</span> trial), <span class="at">data =</span> df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In this formula:</p>
+<ul>
+<li><code>-1 + trial</code>: Includes a fixed intercept for each trial</li>
+<li><code>baseline:trial</code>: Allows each trial to have its own slope for baseline (trial-specific baseline effect)</li>
+<li><code>trt</code>: Estimates the average treatment effect across trials</li>
+<li><code>(0 + trt | trial)</code>: Allows the treatment effect to vary randomly by trial</li>
+</ul>
+<p><strong>Note</strong>: The <code>trt</code> variable is modeled as a numeric binary indicator (0 = control, 1 = active treatment), rather than as a categorical factor. This allows us to directly interpret the fixed effect of <code>trt</code> as the <strong>average treatment effect</strong>. Additionally, modeling <code>trt</code> as numeric is necessary to estimate a random slope for <code>trt</code> per trial via <code>(0 + trt | trial)</code>. This would not be valid if <code>trt</code> were treated as a factor (e.g., using <code>trta</code>).</p>
+<p>The results are as follows:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: outcome ~ -1 + trial + baseline:trial + trt + (0 + trt | trial)
+   Data: df
+REML criterion at convergence: 3051.627
+Random effects:
+ Groups   Name Std.Dev.
+ trial    trt  0.3575  
+ Residual      5.0977  
+Number of obs: 500, groups:  trial, 5
+Fixed Effects:
+         trialTrial_1           trialTrial_2           trialTrial_3  
+              -2.2450                -6.4129                -6.9032  
+         trialTrial_4           trialTrial_5                    trt  
+             -17.2160               -14.7140                -2.5472  
+trialTrial_1:baseline  trialTrial_2:baseline  trialTrial_3:baseline  
+               0.8721                 0.9206                 0.9626  
+trialTrial_4:baseline  trialTrial_5:baseline  
+               1.0096                 0.8546  </code></pre>
+</div>
+</div>
+<p>We compute the 95% confidence interval for the average treatment effect and a prediction interval that reflects heterogeneity across trials. The prediction interval estimates the range where a future trial’s treatment effect might fall.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>((ci_mu <span class="ot">&lt;-</span> <span class="fu">confint</span>(fit_random_hte, <span class="at">method =</span> <span class="st">"Wald"</span>)[<span class="st">"trt"</span>, ]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    2.5 %    97.5 % 
+-3.500926 -1.593567 </code></pre>
+</div>
+</div>
+<p>To derive an approximate 95% prediction interval for the treatment effect, we can use the following approach:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract mean treatment effect</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="fu">fixef</span>(fit_random_hte)[<span class="st">"trt"</span>]</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>tau2 <span class="ot">&lt;-</span> <span class="fu">VarCorr</span>(fit_random_hte)<span class="sc">$</span>trial[<span class="st">"trt"</span>, <span class="st">"trt"</span>]</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>var_mu <span class="ot">&lt;-</span> <span class="fu">vcov</span>(fit_random_hte)[<span class="st">"trt"</span>, <span class="st">"trt"</span>]</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of studies</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>n_studies <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">unique</span>(df<span class="sc">$</span>trial))</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>df_t <span class="ot">&lt;-</span> n_studies <span class="sc">-</span> <span class="dv">2</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="co"># t critical value for 95% PI</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>t_crit <span class="ot">&lt;-</span> <span class="fu">qt</span>(<span class="fl">0.975</span>, <span class="at">df =</span> df_t)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 95% Prediction Interval</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>pred_lower <span class="ot">&lt;-</span> mu <span class="sc">-</span> t_crit <span class="sc">*</span> <span class="fu">sqrt</span>(tau2 <span class="sc">+</span> var_mu)</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>pred_upper <span class="ot">&lt;-</span> mu <span class="sc">+</span> t_crit <span class="sc">*</span> <span class="fu">sqrt</span>(tau2 <span class="sc">+</span> var_mu)</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a><span class="fu">cbind</span>(pred_lower, pred_upper)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    pred_lower pred_upper
+trt  -4.468743 -0.6257501</code></pre>
+</div>
+</div>
+<p>The prediction interval is wide, suggesting meaningful heterogeneity in treatment effects across trials. This implies that in some future settings, the treatment could be less effective compared to the pooled estimate.</p>
+<p>The fitted effects and prediction interval are visualized in <a href="#fig-model-fit-stratified-scenario3" class="quarto-xref">Figure&nbsp;7</a>.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-model-fit-stratified-scenario3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-model-fit-stratified-scenario3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="hiearachical_modeling_files/figure-html/fig-model-fit-stratified-scenario3-1.png" class="img-fluid figure-img" width="768">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-model-fit-stratified-scenario3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: Trial-Specific Estimates from the Random-Effects Model. Estimated intercepts terms (left) and treatment effects (right) for each trial are shown, based on a linear mixed-effects model with fixed intercepts by trial and random slopes for treatment. The black points and lines represent point estimates and 95% confidence intervals. The pooled treatment effect estimate is shown at the bottom, with dashed red lines indicating the 95% prediction interval for a new trial.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="investigating-effect-modification" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="investigating-effect-modification"><span class="header-section-number">3.4</span> Investigating effect modification</h2>
+<p>We now explore whether the observed treatment effect heterogeneity can be explained by effect modification, using interaction terms between treatment and baseline severity.</p>
+<section id="sec-commonInteraction" class="level3" data-number="3.4.1">
+<h3 data-number="3.4.1" class="anchored" data-anchor-id="sec-commonInteraction"><span class="header-section-number">3.4.1</span> Common interaction effect</h3>
+<p>A simple extension of our linear mixed model defined in <a href="#sec-stratifiedREmodel" class="quarto-xref">Section&nbsp;3.3</a> – with fixed intercepts per trial and random slopes for treatment – is to include a <strong>common treatment-by-baseline interaction</strong> term. This allows us to assess whether baseline severity modifies the treatment effect, assuming the interaction is constant across trials.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>fit_hte_1 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(outcome <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> trial <span class="sc">+</span> baseline<span class="sc">:</span>trial <span class="sc">+</span> trt <span class="sc">+</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>                    baseline<span class="sc">:</span>trt <span class="sc">+</span> (<span class="dv">0</span> <span class="sc">+</span> trt <span class="sc">|</span> trial) , <span class="at">data =</span> df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In this formula:</p>
+<ul>
+<li><code>-1 + trial</code>: Fixed intercept per trial</li>
+<li><code>baseline:trial</code>: Fixed effect for baseline severity per trial</li>
+<li><code>trt</code>: Estimates the average treatment effect across trials</li>
+<li><code>baseline:trt</code>: Interaction between baseline severity and treatment</li>
+<li><code>(0 + trt | trial)</code>: Allows the treatment effect to vary randomly by trial</li>
+</ul>
+<p>The results are as follows:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: outcome ~ -1 + trial + baseline:trial + trt + baseline:trt +  
+    (0 + trt | trial)
+   Data: df
+REML criterion at convergence: 3050.085
+Random effects:
+ Groups   Name Std.Dev.
+ trial    trt  1.655   
+ Residual      5.051   
+Number of obs: 500, groups:  trial, 5
+Fixed Effects:
+         trialTrial_1           trialTrial_2           trialTrial_3  
+              -3.5414                -8.6981                -8.6412  
+         trialTrial_4           trialTrial_5                    trt  
+             -19.4052               -16.6633                 1.8399  
+trialTrial_1:baseline  trialTrial_2:baseline  trialTrial_3:baseline  
+               0.9613                 1.0010                 1.0315  
+trialTrial_4:baseline  trialTrial_5:baseline           baseline:trt  
+               1.0793                 0.9112                -0.1610  </code></pre>
+</div>
+</div>
+<p>The coefficients <code>trt</code> and <code>baseline:trt</code> define a linear relationship between baseline severity and the estimated treatment effect (Active vs Control). In <a href="#fig-hte-commoninteraction" class="quarto-xref">Figure&nbsp;8</a>, we visualize this relationship using the model’s fixed effects, with a dashed line indicating no treatment effect.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-hte-commoninteraction" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-hte-commoninteraction-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="hiearachical_modeling_files/figure-html/fig-hte-commoninteraction-1.png" class="img-fluid figure-img" width="768">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-hte-commoninteraction-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: Estimated treatment effect (active vs control) as a function of baseline severity. The red dashed line at 0 indicates no treatment benefit. Negative values suggest a favorable effect of the active treatment, while positive values suggest harm. The distribution of baseline values across the included trials is shown as rug marks along the x-axis. Colored dots represent the expected (marginal) treatment effect within each trial, calculated by averaging predicted outcomes across that trial’s observed baseline distribution.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Although the model includes a treatment-by-baseline interaction (<code>baseline:trt</code>), there remains evidence of heterogeneity in treatment effect across trials. This is indicated by the random slope variance for treatment (<code>trt | trial</code>), with an estimated standard deviation of 1.65.</p>
+</section>
+<section id="random-within-study-interaction-effects" class="level3" data-number="3.4.2">
+<h3 data-number="3.4.2" class="anchored" data-anchor-id="random-within-study-interaction-effects"><span class="header-section-number">3.4.2</span> Random within-study interaction effects</h3>
+<p>In this approach, we stratify all parameters <strong>except</strong> for the treatment-by-covariate interaction term by trial. This includes the parameter representing the treatment effect at the covariate’s reference value. All “nuisance” parameters (i.e., parameters not of primary interest) are allowed to vary across trials. A random effect is included only on the within-trial interaction term (<code>baseline:trt</code>), capturing heterogeneity in effect modification across trials.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>fit_hte_2 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(outcome <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> trial <span class="sc">+</span> baseline<span class="sc">:</span>trial <span class="sc">+</span> trt<span class="sc">:</span>trial <span class="sc">+</span> </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                    baseline<span class="sc">:</span>trt <span class="sc">+</span> (<span class="dv">0</span> <span class="sc">+</span> baseline<span class="sc">:</span>trt <span class="sc">|</span> trial) , <span class="at">data =</span> df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This stratification of all nuisance parameters – including the treatment effect at the covariate’s reference value — ensures that the estimate of <code>baseline:trt</code> (the treatment–covariate interaction) is informed purely by within-trial comparisons.</p>
+<p>The fitted model is:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: outcome ~ -1 + trial + baseline:trial + trt:trial + baseline:trt +  
+    (0 + baseline:trt | trial)
+   Data: df
+REML criterion at convergence: 3031.288
+Random effects:
+ Groups   Name         Std.Dev.
+ trial    baseline:trt 0.000   
+ Residual              5.049   
+Number of obs: 500, groups:  trial, 5
+Fixed Effects:
+         trialTrial_1           trialTrial_2           trialTrial_3  
+              -3.7589                -9.2970                -9.0849  
+         trialTrial_4           trialTrial_5  trialTrial_1:baseline  
+             -20.0635               -17.4157                 0.9942  
+trialTrial_2:baseline  trialTrial_3:baseline  trialTrial_4:baseline  
+               1.0233                 1.0515                 1.0959  
+trialTrial_5:baseline       trialTrial_1:trt       trialTrial_2:trt  
+               0.9255                -0.2784                 3.1703  
+     trialTrial_3:trt       trialTrial_4:trt       trialTrial_5:trt  
+               2.6088                 4.6171                 5.2918  
+         baseline:trt  
+              -0.2066  
+optimizer (nloptwrap) convergence code: 0 (OK) ; 0 optimizer warnings; 1 lme4 warnings </code></pre>
+</div>
+</div>
+<p>Since the between-trial variance in the interaction effects is close to zero, we may simplify the model by removing the random component and estimating a common interaction term across trials:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>fit_hte_2b <span class="ot">&lt;-</span> <span class="fu">glm</span>(outcome <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> trial <span class="sc">+</span> baseline<span class="sc">:</span>trial <span class="sc">+</span> trt<span class="sc">:</span>trial <span class="sc">+</span> </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>                    baseline<span class="sc">:</span>trt, <span class="at">data =</span> df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The coefficients <code>trt:trial</code> and <code>baseline:trt</code> define a linear relationship between baseline severity and the estimated treatment effect (active vs control), with a trial-specific intercept and a common interaction slope. In <a href="#fig-hte-rwi" class="quarto-xref">Figure&nbsp;9</a>, we visualize this relationship using both model-predicted curves and trial-level marginal estimates.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-hte-rwi" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-hte-rwi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="hiearachical_modeling_files/figure-html/fig-hte-rwi-1.png" class="img-fluid figure-img" width="768">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-hte-rwi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9: Estimated treatment effect (active vs control) as a function of baseline severity for each trial. The red dashed line at 0 indicates no treatment benefit. Negative values suggest a favorable effect of the active treatment, while positive values suggest harm. Rug marks show the distribution of baseline values. Coloured lines and dots represent, respectively, the model-based treatment-effect curves and the marginal (average) treatment effect within each trial.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="distentangling-within--and-across-study-interaction" class="level3" data-number="3.4.3">
+<h3 data-number="3.4.3" class="anchored" data-anchor-id="distentangling-within--and-across-study-interaction"><span class="header-section-number">3.4.3</span> Distentangling within- and across-study interaction</h3>
+<p>In this approach, we decompose the covariate <code>baseline</code> into two components: a within-trial centered value (<code>cbase</code>) and a trial-level mean (<code>xk_mean</code>). Specifically, we define <code>cbase = baseline - xk_mean</code> and include both <code>trt:cbase</code> and <code>xk_mean:trt</code> in the model. The coefficient for <code>trt:cbase</code> captures the within-trial treatment–covariate interaction, while the coefficient for <code>xk_mean:trt</code> represents the between-trial effect of the trial-level covariate mean on treatment effect.</p>
+<p>By explicitly modeling both components, this formulation separates within- and between-trial sources of interaction. As a result, the estimate of the within-trial interaction is not biased by between-trial heterogeneity in the covariate distribution (as is the case in <a href="#sec-commonInteraction" class="quarto-xref">Section&nbsp;3.4.1</a>). This is especially important in avoiding aggregation bias when interpreting effect modification.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>fit_hte_3 <span class="ot">&lt;-</span> <span class="fu">lmer</span>(outcome <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> trial <span class="sc">+</span> trt <span class="sc">+</span> trial<span class="sc">:</span>baseline <span class="sc">+</span> </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>                    trt<span class="sc">:</span>cbase <span class="sc">+</span> xk_mean<span class="sc">:</span>trt <span class="sc">+</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>                    (<span class="dv">0</span> <span class="sc">+</span> trt <span class="sc">|</span> trial) <span class="sc">+</span> (<span class="dv">0</span> <span class="sc">+</span> trt<span class="sc">:</span>cbase <span class="sc">|</span> trial),</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">data =</span> df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The fitted model is:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: 
+outcome ~ -1 + trial + trt + trial:baseline + trt:cbase + xk_mean:trt +  
+    (0 + trt | trial) + (0 + trt:cbase | trial)
+   Data: df
+REML criterion at convergence: 3045.39
+Random effects:
+ Groups   Name      Std.Dev.
+ trial    trt       0.000   
+ trial.1  trt:cbase 0.000   
+ Residual           5.044   
+Number of obs: 500, groups:  trial, 5
+Fixed Effects:
+         trialTrial_1           trialTrial_2           trialTrial_3  
+              -3.9838                -8.7689                -8.9990  
+         trialTrial_4           trialTrial_5                    trt  
+             -20.0136               -17.6781                -6.5584  
+trialTrial_1:baseline  trialTrial_2:baseline  trialTrial_3:baseline  
+               0.9840                 1.0183                 1.0529  
+trialTrial_4:baseline  trialTrial_5:baseline              trt:cbase  
+               1.1020                 0.9238                -0.2078  
+          trt:xk_mean  
+               0.1504  
+optimizer (nloptwrap) convergence code: 0 (OK) ; 0 optimizer warnings; 1 lme4 warnings </code></pre>
+</div>
+</div>
+<p>Since the between-trial variance in the treatment effects and interaction effects is close to zero, we may simplify the model by removing the random components:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>fit_hte_3b <span class="ot">&lt;-</span> <span class="fu">glm</span>(outcome <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> trial <span class="sc">+</span> trt <span class="sc">+</span> trial<span class="sc">:</span>baseline <span class="sc">+</span> </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>                    trt<span class="sc">:</span>cbase <span class="sc">+</span> trt<span class="sc">:</span>xk_mean, <span class="at">data =</span> df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The model includes two interaction terms: <code>cbase:trt</code>, which captures the within-trial interaction between the centered covariate and treatment; and <code>xk_mean:trt</code>, which captures the across-trial interaction effect due to variation in trial-level covariate means. Together, these coefficients define a linear relationship between baseline severity and the estimated treatment effect (active vs control), while distinguishing within- and between-trial sources of effect modification. In <a href="#fig-hte-centering" class="quarto-xref">Figure&nbsp;10</a>, we visualize this relationship using both model-predicted curves and trial-level marginal treatment effect estimates.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-hte-centering" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-hte-centering-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="hiearachical_modeling_files/figure-html/fig-hte-centering-1.png" class="img-fluid figure-img" width="768">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-hte-centering-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10: Estimated treatment effect (active vs control) as a function of baseline severity for each trial. The red dashed line at 0 indicates no treatment benefit. Negative values suggest a favorable effect of the active treatment, while positive values suggest harm. Rug marks show the distribution of baseline values. Coloured lines and dots represent, respectively, the model-based treatment-effect curves and the marginal (average) treatment effect within each trial. The dotted black line visualizes the across-trial interaction effect, showing how the average baseline severity across trials relates to the average treatment effect.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
