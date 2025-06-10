@@ -3,16 +3,7 @@ project:
 
 website:
   title: "Advanced Pooled Analyses Practicals"
-  navbar:
-    left:
-      - href: index.qmd
-        text: Home
-      - href: computer_practical.qmd
-        text: Computer Practical
-      - href: hiearachical_modeling.qmd
-        text: Hierarchical Modeling
-      - href: resources.qmd
-        text: Resources
+  navbar: false
 
 format:
   html:
