@@ -1,3 +1,5 @@
+![Build Status](https://github.com/smartdata-analysis-and-statistics/clinical-trial-pooling-practicals/actions/workflows/render-quarto.yml/badge.svg)
+
 # Mastering Pooled Analysis of Clinical Trials
 
 This practical is part of our comprehensive course Mastering Pooled Analysis of Clinical Trials, which is available at:
